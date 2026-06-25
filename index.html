@@ -738,14 +738,12 @@ const CAT_ICONS = {
 //  STATE
 // ═══════════════════════════════════════════════════════
 let S = {
-  codigo: null,
+  codigo: null,   // 6-letter trip code (= Firebase key)
   viaje:  null,
   u1:     null,
   u2:     null,
-  yo:     null,
-  monedaBase: 'COP',
-  extraViajeros: [],
-  gastos: {},
+  yo:     null,   // my name in this session
+  gastos: {},     // { fbKey: {desc,cat,fecha,valor,pago,tipo,ts} }
   unsubscribe: null,
 };
 let editKey  = null;  // Firebase key of gasto being edited
@@ -828,7 +826,7 @@ function saveSession() {
 function loadSession() {
   try {
     const d = JSON.parse(localStorage.getItem('gv3') || 'null');
-    if (d && d.codigo) { Object.assign(S, d); S.monedaBase = d.monedaBase || 'COP'; S.extraViajeros = d.extraViajeros || []; return true; }
+    if (d && d.codigo) { Object.assign(S, d); return true; }
   } catch(e) {}
   return false;
 }
@@ -898,10 +896,9 @@ function crearViaje() {
   const u1 = nombres[0], u2 = nombres[1];
   const extraViajeros = nombres.slice(2);
 
-  const monedaBase = document.getElementById('sMoneda') ? document.getElementById('sMoneda').value || 'COP' : 'COP';
-  set(ref(db, `viajes/${codigo}`), { viaje, u1, u2, extraViajeros, monedaBase, creadoEn: Date.now() })
+  set(ref(db, `viajes/${codigo}`), { viaje, u1, u2, extraViajeros, creadoEn: Date.now() })
     .then(() => {
-      Object.assign(S, { codigo, viaje, u1, u2, extraViajeros, monedaBase, yo: u1 });
+      Object.assign(S, { codigo, viaje, u1, u2, extraViajeros, yo: u1 });
       saveSession();
       lanzarApp();
     })
@@ -967,7 +964,7 @@ function actualizarUI() {
   const extras = Array.isArray(S.extraViajeros) ? S.extraViajeros : [];
   const todos  = [S.u1, S.u2, ...extras].filter(Boolean);
 
-  document.getElementById('topMeta').textContent = todos.join(' · ') + ' [' + (S.monedaBase||'?') + ']';
+  document.getElementById('topMeta').textContent = todos.join(' · ');
 
   const sel = document.getElementById('fPago');
   sel.innerHTML = '<option value="">¿Quién pagó?</option>' +
@@ -1522,39 +1519,25 @@ function showToast(msg) {
 function escH(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-function _mSym(m) {
-  var t = {COP:'$',USD:'US$',EUR:'€',GBP:'£',ARS:'$',CLP:'$',MXN:'$',PEN:'S/',BRL:'R$',JPY:'¥'};
-  return (t[m] || m) + ' ';
-}
-function _mDec(m) {
-  return ['COP','CLP','ARS','MXN','JPY'].indexOf(m) >= 0 ? 0 : 2;
-}
-function _mConv(valor, dest) {
-  var base = S.monedaBase || 'COP';
-  if (!dest || dest === base) return valor;
-  var rB = FALLBACK_USD[base]  || 1;
-  var rD = FALLBACK_USD[dest]  || 1;
-  return valor / rB * rD;
-}
 function fmtCOP(n) {
-  var m   = S.monedaBase || 'COP';
-  var v   = _mConv(n, m);
-  var sym = _mSym(m);
-  var dec = _mDec(m);
-  var abs = Math.abs(v).toFixed(dec);
+  var syms = {COP:'$',USD:'US$',EUR:'€',GBP:'£',ARS:'$',CLP:'$',MXN:'$',PEN:'S/',BRL:'R$',JPY:'¥'};
+  var m = (S && S.monedaBase) ? S.monedaBase : 'COP';
+  var sym = (syms[m] || m) + ' ';
+  var dec = ['COP','CLP','ARS','MXN','JPY'].indexOf(m) >= 0 ? 0 : 2;
+  var abs = Math.abs(n).toFixed(dec);
   var miles = Number(abs).toLocaleString('es-CL', {minimumFractionDigits: dec});
-  return v < 0 ? '(' + sym + miles + ')' : sym + miles;
+  return n < 0 ? '('+sym+miles+')' : sym+miles;
 }
 function fmtBal(n) {
-  var m   = S.monedaBase || 'COP';
-  var v   = _mConv(n, m);
-  var sym = _mSym(m);
-  var dec = _mDec(m);
-  var abs = Math.abs(v).toFixed(dec);
+  var syms = {COP:'$',USD:'US$',EUR:'€',GBP:'£',ARS:'$',CLP:'$',MXN:'$',PEN:'S/',BRL:'R$',JPY:'¥'};
+  var m = (S && S.monedaBase) ? S.monedaBase : 'COP';
+  var sym = (syms[m] || m) + ' ';
+  var dec = ['COP','CLP','ARS','MXN','JPY'].indexOf(m) >= 0 ? 0 : 2;
+  var abs = Math.abs(n).toFixed(dec);
   var miles = Number(abs).toLocaleString('es-CL', {minimumFractionDigits: dec});
-  if (v < -0.005) return '(' + sym + miles + ')';
-  if (v >  0.005) return '+' + sym + miles;
-  return sym + '0';
+  if (n < -0.005) return '('+sym+miles+')';
+  if (n >  0.005) return '+'+sym+miles;
+  return sym+'0';
 }
 
 // ═══════════════════════════════════════════════════════
