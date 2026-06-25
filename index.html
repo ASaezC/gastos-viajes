@@ -1036,7 +1036,7 @@ function nuevoViaje() {
 function suscribir() {
   const { db, ref, onValue, get } = window.FB;
 
-  // Leer datos del viaje (extraViajeros, monedaBase) desde Firebase
+  // Leer viaje primero para tener extraViajeros antes de renderizar
   get(ref(db, `viajes/${S.codigo}`)).then(snap => {
     const d = snap.val();
     if (d) {
@@ -1044,19 +1044,19 @@ function suscribir() {
       S.monedaBase    = d.monedaBase    || 'COP';
       actualizarUI();
     }
+    // Suscribir gastos DESPUÉS de tener extraViajeros
+    const gastosRef = ref(db, `gastos/${S.codigo}`);
+    S.unsubscribe = onValue(gastosRef, snap => {
+      S.gastos = snap.val() || {};
+      setSyncDot('live');
+      const total = Object.values(S.gastos).reduce((s,g) => s+g.valor, 0);
+      guardarEnLista({ codigo: S.codigo, viaje: S.viaje, u1: S.u1, u2: S.u2,
+        extraViajeros: S.extraViajeros, yo: S.yo, ultimoTotal: total });
+      renderViajes();
+      renderGastos();
+      renderResumen();
+    }, () => setSyncDot('err'));
   });
-
-  const gastosRef = ref(db, `gastos/${S.codigo}`);
-  S.unsubscribe = onValue(gastosRef, snap => {
-    S.gastos = snap.val() || {};
-    setSyncDot('live');
-    const total = Object.values(S.gastos).reduce((s,g) => s+g.valor, 0);
-    guardarEnLista({ codigo: S.codigo, viaje: S.viaje, u1: S.u1, u2: S.u2,
-      extraViajeros: S.extraViajeros, yo: S.yo, ultimoTotal: total });
-    renderViajes();
-    renderGastos();
-    renderResumen();
-  }, () => setSyncDot('err'));
 }
 
 function setSyncDot(estado) {
