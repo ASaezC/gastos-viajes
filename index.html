@@ -1519,17 +1519,39 @@ function showToast(msg) {
 function escH(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+function _mSym(m) {
+  var t = {COP:'$',USD:'US$',EUR:'€',GBP:'£',ARS:'$',CLP:'$',MXN:'$',PEN:'S/',BRL:'R$',JPY:'¥'};
+  return (t[m] || m) + ' ';
+}
+function _mDec(m) {
+  return ['COP','CLP','ARS','MXN','JPY'].indexOf(m) >= 0 ? 0 : 2;
+}
+function _mConv(valor, dest) {
+  var base = S.monedaBase || 'COP';
+  if (!dest || dest === base) return valor;
+  var rB = FALLBACK_USD[base]  || 1;
+  var rD = FALLBACK_USD[dest]  || 1;
+  return valor / rB * rD;
+}
 function fmtCOP(n) {
-  const abs = Math.round(Math.abs(n));
-  const miles = abs.toLocaleString('es-CL');
-  return n < 0 ? `($ ${miles})` : `$ ${miles}`;
+  var m   = S.monedaBase || 'COP';
+  var v   = _mConv(n, m);
+  var sym = _mSym(m);
+  var dec = _mDec(m);
+  var abs = Math.abs(v).toFixed(dec);
+  var miles = Number(abs).toLocaleString('es-CL', {minimumFractionDigits: dec});
+  return v < 0 ? '(' + sym + miles + ')' : sym + miles;
 }
 function fmtBal(n) {
-  const abs = Math.round(Math.abs(n));
-  const miles = abs.toLocaleString('es-CL');
-  if (n < 0) return `($ ${miles})`;
-  if (n > 0) return `+$ ${miles}`;
-  return `$ 0`;
+  var m   = S.monedaBase || 'COP';
+  var v   = _mConv(n, m);
+  var sym = _mSym(m);
+  var dec = _mDec(m);
+  var abs = Math.abs(v).toFixed(dec);
+  var miles = Number(abs).toLocaleString('es-CL', {minimumFractionDigits: dec});
+  if (v < -0.005) return '(' + sym + miles + ')';
+  if (v >  0.005) return '+' + sym + miles;
+  return sym + '0';
 }
 
 // ═══════════════════════════════════════════════════════
