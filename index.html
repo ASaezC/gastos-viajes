@@ -621,29 +621,8 @@ input[type="number"]::-webkit-inner-spin-button { display: none; }
         </select>
       </div>
       <div class="c-row"><span class="c-lbl">Fecha</span><input id="fFecha" type="date"></div>
-      <div class="c-row">
-        <span class="c-lbl">Valor</span>
-        <div style="display:flex;gap:6px;flex:1">
-          <input id="fValor" type="number" placeholder="0" min="0" step="1" inputmode="decimal"
-            style="flex:1;min-width:0" oninput="actualizarConversion()">
-          <select id="fMoneda" onchange="actualizarConversion()"
-            style="width:80px;background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--text1);font-family:'IBM Plex Mono',monospace;font-size:0.85rem;padding:0 6px">
-            <option value="COP">COP</option>
-            <option value="USD">USD</option>
-            <option value="EUR">EUR</option>
-            <option value="GBP">GBP</option>
-            <option value="ARS">ARS</option>
-            <option value="CLP">CLP</option>
-            <option value="MXN">MXN</option>
-            <option value="PEN">PEN</option>
-            <option value="BRL">BRL</option>
-            <option value="JPY">JPY</option>
-          </select>
-        </div>
-      </div>
-      <div id="convRow" style="display:none;padding:4px 0 0 0">
-        <div style="font-size:0.78rem;color:var(--text2);text-align:right;padding-right:4px" id="convLabel"></div>
-      </div>
+      <div class="c-row"><span class="c-lbl" style="flex-shrink:0">Valor</span><input id="fValor" type="number" placeholder="0" min="0" step="0.01" inputmode="decimal" style="min-width:0;flex:1"></div>
+      <input type="hidden" id="fMoneda" value="COP">
       <div class="c-row"><span class="c-lbl">Pagó</span><select id="fPago"></select></div>
     </div>
     <div class="c-card" style="margin-top:0">
@@ -896,10 +875,9 @@ function crearViaje() {
   const u1 = nombres[0], u2 = nombres[1];
   const extraViajeros = nombres.slice(2);
 
-  var mbVal = document.getElementById('sMoneda') ? (document.getElementById('sMoneda').value || 'COP') : 'COP';
-  set(ref(db, `viajes/${codigo}`), { viaje, u1, u2, extraViajeros, monedaBase: mbVal, creadoEn: Date.now() })
+  set(ref(db, `viajes/${codigo}`), { viaje, u1, u2, extraViajeros, creadoEn: Date.now() })
     .then(() => {
-      Object.assign(S, { codigo, viaje, u1, u2, extraViajeros, monedaBase: mbVal, yo: u1 });
+      Object.assign(S, { codigo, viaje, u1, u2, extraViajeros, yo: u1 });
       saveSession();
       lanzarApp();
     })
