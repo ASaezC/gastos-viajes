@@ -896,9 +896,10 @@ function crearViaje() {
   const u1 = nombres[0], u2 = nombres[1];
   const extraViajeros = nombres.slice(2);
 
-  set(ref(db, `viajes/${codigo}`), { viaje, u1, u2, extraViajeros, creadoEn: Date.now() })
+  var mbVal = document.getElementById('sMoneda') ? (document.getElementById('sMoneda').value || 'COP') : 'COP';
+  set(ref(db, `viajes/${codigo}`), { viaje, u1, u2, extraViajeros, monedaBase: mbVal, creadoEn: Date.now() })
     .then(() => {
-      Object.assign(S, { codigo, viaje, u1, u2, extraViajeros, yo: u1 });
+      Object.assign(S, { codigo, viaje, u1, u2, extraViajeros, monedaBase: mbVal, yo: u1 });
       saveSession();
       lanzarApp();
     })
