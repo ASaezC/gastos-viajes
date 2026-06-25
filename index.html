@@ -966,7 +966,7 @@ function actualizarUI() {
   const extras = Array.isArray(S.extraViajeros) ? S.extraViajeros : [];
   const todos  = [S.u1, S.u2, ...extras].filter(Boolean);
 
-  document.getElementById('topMeta').textContent = todos.join(' · ');
+  document.getElementById('topMeta').textContent = todos.join(' · ') + ' [' + (S.monedaBase||'?') + ']';
 
   const sel = document.getElementById('fPago');
   sel.innerHTML = '<option value="">¿Quién pagó?</option>' +
