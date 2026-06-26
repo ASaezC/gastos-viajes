@@ -492,7 +492,7 @@ input[type="number"]::-webkit-inner-spin-button { display: none; }
       <span>💱 Moneda del viaje</span><span class="acord-arrow">▼</span>
     </button>
     <div id="acordMoneda" class="acord-body" style="display:none">
-      <select class="setup-input" id="sMoneda">
+      <select class="setup-input" id="sMoneda" onchange="monedaSeleccionada=this.value">
         <option value="COP">🇨🇴 COP — Peso colombiano</option>
         <option value="USD">🇺🇸 USD — Dólar</option>
         <option value="EUR">🇪🇺 EUR — Euro</option>
@@ -880,6 +880,8 @@ function genCodigo() {
 // ═══════════════════════════════════════════════════════
 //  CREAR VIAJE
 // ═══════════════════════════════════════════════════════
+var monedaSeleccionada = 'COP';
+
 function toggleAcord(id, btn) {
   var body = document.getElementById(id);
   var open = body.style.display !== 'none';
@@ -920,7 +922,7 @@ function crearViaje() {
   const u1 = nombres[0], u2 = nombres[1];
   const extraViajeros = nombres.slice(2);
 
-  const monedaBase = document.getElementById('sMoneda') ? (document.getElementById('sMoneda').value || 'COP') : 'COP';
+  const monedaBase = monedaSeleccionada || 'COP';
   set(ref(db, `viajes/${codigo}`), { viaje, u1, u2, extraViajeros, monedaBase, creadoEn: Date.now() })
     .then(() => {
       Object.assign(S, { codigo, viaje, u1, u2, extraViajeros, monedaBase, yo: u1 });
