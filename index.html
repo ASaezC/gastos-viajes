@@ -1402,14 +1402,15 @@ function guardar() {
 
   const { db, ref, push, update } = window.FB;
 
-  // Convertir valor a moneda base del viaje
+  // Convertir valor a moneda base del viaje (solo FALLBACK_USD — estable)
   const base = S.monedaBase || 'COP';
-  const valorBase = monedaGasto === base ? valor : (() => {
-    const rOrigen = tasasUSD[monedaGasto] || FALLBACK_USD[monedaGasto] || 1;
-    const rBase   = tasasUSD[base]        || FALLBACK_USD[base]        || 1;
-    return valor / rOrigen * rBase;
+  const valorFinal = (() => {
+    if (monedaGasto === base) return valor;
+    const rates = FALLBACK_USD;
+    const rOrigen = rates[monedaGasto] || 1;
+    const rBase   = rates[base]        || 1;
+    return Math.round((valor / rOrigen * rBase) * 100) / 100;
   })();
-  const valorFinal = Math.round(valorBase * 100) / 100;
 
   if (editKey) {
     const tsOrig = S.gastos[editKey]?.ts || Date.now();
