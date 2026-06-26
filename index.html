@@ -553,6 +553,7 @@ input[type="number"]::-webkit-inner-spin-button { display: none; }
       <span class="back-arrow">‹</span> Volver a Gastos
     </button>
     <div class="sec-head"><span class="sec-title">Resumen</span></div>
+    <div style="padding:0 16px 12px"><button onclick="exportarExcel()" style="width:100%;background:var(--gold);border:none;border-radius:12px;color:#0d0d0d;font-family:'IBM Plex Mono',monospace;font-size:0.9rem;font-weight:600;letter-spacing:1px;padding:13px;cursor:pointer;touch-action:manipulation">&#128229; DESCARGAR EXCEL</button></div>
     <div id="resumenHTML"></div>
     <div class="spacer"></div>
   </div>
@@ -731,14 +732,12 @@ const CAT_ICONS = {
 //  STATE
 // ═══════════════════════════════════════════════════════
 let S = {
-  codigo: null,
+  codigo: null,   // 6-letter trip code (= Firebase key)
   viaje:  null,
   u1:     null,
   u2:     null,
-  yo:     null,
-  monedaBase: 'COP',
-  extraViajeros: [],
-  gastos: {},
+  yo:     null,   // my name in this session
+  gastos: {},     // { fbKey: {desc,cat,fecha,valor,pago,tipo,ts} }
   unsubscribe: null,
 };
 let editKey  = null;  // Firebase key of gasto being edited
@@ -891,10 +890,9 @@ function crearViaje() {
   const u1 = nombres[0], u2 = nombres[1];
   const extraViajeros = nombres.slice(2);
 
-  const monedaBase = document.getElementById('sMoneda') ? (document.getElementById('sMoneda').value || 'COP') : 'COP';
-  set(ref(db, `viajes/${codigo}`), { viaje, u1, u2, extraViajeros, monedaBase, creadoEn: Date.now() })
+  set(ref(db, `viajes/${codigo}`), { viaje, u1, u2, extraViajeros, creadoEn: Date.now() })
     .then(() => {
-      Object.assign(S, { codigo, viaje, u1, u2, extraViajeros, monedaBase, yo: u1 });
+      Object.assign(S, { codigo, viaje, u1, u2, extraViajeros, yo: u1 });
       saveSession();
       lanzarApp();
     })
@@ -1104,11 +1102,11 @@ function guardar() {
 
   const { db, ref, push, update } = window.FB;
 
-  // Convertir valor a moneda base del viaje (solo FALLBACK_USD — sin API)
+  // Convertir valor a moneda base del viaje
   const base = S.monedaBase || 'COP';
   const valorBase = monedaGasto === base ? valor : (() => {
-    const rOrigen = FALLBACK_USD[monedaGasto] || 1;
-    const rBase   = FALLBACK_USD[base]        || 1;
+    const rOrigen = tasasUSD[monedaGasto] || FALLBACK_USD[monedaGasto] || 1;
+    const rBase   = tasasUSD[base]        || FALLBACK_USD[base]        || 1;
     return valor / rOrigen * rBase;
   })();
   const valorFinal = Math.round(valorBase * 100) / 100;
@@ -1316,6 +1314,28 @@ function renderGastos() {
 // ═══════════════════════════════════════════════════════
 //  RENDER RESUMEN
 // ═══════════════════════════════════════════════════════
+function exportarExcel() {
+  var base = S.monedaBase || 'COP';
+  var gastos = Object.values(S.gastos);
+  var lineas = ['Fecha,Descripcion,Categoria,Quien pago,Tipo,Valor ' + base];
+  for (var i=0; i<gastos.length; i++) {
+    var g = gastos[i];
+    var cat = (g.cat || '').replace(/^\S+\s/, '');
+    lineas.push([(g.fecha||''), (g.desc||''), cat, (g.pago||''), (g.tipo||''), (g.valor||0)].join(','));
+  }
+  var txt = lineas.join('\r\n');
+  var blob = new Blob(['\uFEFF' + txt], {type: 'text/csv;charset=utf-8;'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = (S.viaje || 'gastos') + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('Descargando CSV');
+}
+
 function renderResumen() {
   const el = document.getElementById('resumenHTML');
   const gastos = Object.values(S.gastos);
