@@ -1189,22 +1189,33 @@ function crearViaje() {
 
   if (!window.FB_READY) { showToast('Conectando… intenta en 2 segundos'); return; }
 
-  const codigo = genCodigo();
-  const { db, ref, set } = window.FB;
+  const { db, ref, set, get } = window.FB;
   const u1 = nombres[0], u2 = nombres[1];
   const extraViajeros = nombres.slice(2);
-
   const monedaBase = monedaSeleccionada;
-  set(ref(db, `viajes/${codigo}`), { viaje, u1, u2, extraViajeros, monedaBase, creadoEn: Date.now() })
-    .then(() => {
-      Object.assign(S, { codigo, viaje, u1, u2, extraViajeros, monedaBase, yo: u1 });
-      saveSession();
-      lanzarApp();
-    })
-    .catch(e => {
-      showToast('Error al crear: ' + e.message);
-      console.error(e);
-    });
+
+  // Verificar que el código no exista antes de usarlo
+  const intentarCrear = () => {
+    const codigo = genCodigo();
+    get(ref(db, `viajes/${codigo}`)).then(snap => {
+      if (snap.exists()) {
+        // Colisión — generar otro código
+        intentarCrear();
+        return;
+      }
+      set(ref(db, `viajes/${codigo}`), { viaje, u1, u2, extraViajeros, monedaBase, creadoEn: Date.now() })
+        .then(() => {
+          Object.assign(S, { codigo, viaje, u1, u2, extraViajeros, monedaBase, yo: u1 });
+          saveSession();
+          lanzarApp();
+        })
+        .catch(e => {
+          showToast('Error al crear: ' + e.message);
+          console.error(e);
+        });
+    }).catch(() => showToast('Error de conexión al crear viaje'));
+  };
+  intentarCrear();
 }
 
 // ═══════════════════════════════════════════════════════
