@@ -689,7 +689,32 @@ input[type="number"]::-webkit-inner-spin-button { display: none; }
       <span class="back-arrow">‹</span> Volver a Gastos
     </button>
     <div class="sec-head"><span class="sec-title">Resumen</span></div>
-    <div style="padding:0 16px 12px"><button onclick="exportarExcel()" style="width:100%;background:var(--gold);border:none;border-radius:12px;color:#0d0d0d;font-family:'IBM Plex Mono',monospace;font-size:0.9rem;font-weight:600;letter-spacing:1px;padding:13px;cursor:pointer;touch-action:manipulation">&#128229; DESCARGAR EXCEL</button></div>
+    <div style="display:flex;align-items:center;gap:8px;padding:0 16px 10px">
+      <select id="selMonedaResumen" onchange="cambiarMonedaResumen(this.value)"
+        style="flex:1;background:var(--card);border:1px solid var(--line);border-radius:10px;
+               color:var(--text1);font-family:'IBM Plex Mono',monospace;font-size:0.82rem;padding:7px 10px">
+        <option value="">Moneda del viaje</option>
+        <option value="USD">USD — Dólar</option>
+        <option value="EUR">EUR — Euro</option>
+        <option value="GBP">GBP — Libra</option>
+        <option value="CLP">CLP — Peso chileno</option>
+        <option value="COP">COP — Peso colombiano</option>
+        <option value="ARS">ARS — Peso argentino</option>
+        <option value="MXN">MXN — Peso mexicano</option>
+        <option value="PEN">PEN — Sol</option>
+        <option value="BRL">BRL — Real</option>
+        <option value="JPY">JPY — Yen</option>
+        <option value="CHF">CHF — Franco suizo</option>
+        <option value="CAD">CAD — Dólar canadiense</option>
+        <option value="AUD">AUD — Dólar australiano</option>
+      </select>
+      <button onclick="exportarExcel()"
+        style="background:var(--gold);border:none;border-radius:10px;color:#0d0d0d;
+               font-family:'IBM Plex Mono',monospace;font-size:0.82rem;font-weight:600;
+               padding:7px 12px;cursor:pointer;white-space:nowrap;touch-action:manipulation">
+        📥 Excel
+      </button>
+    </div>
     <div id="resumenHTML"></div>
     <div class="spacer"></div>
   </div>
@@ -843,6 +868,73 @@ input[type="number"]::-webkit-inner-spin-button { display: none; }
     <div class="spacer"></div>
   </div>
 
+  <!-- SCREEN AYUDA -->
+  <div class="screen" id="sc-ayuda">
+    <div class="sec-head"><span class="sec-title">Ayuda</span></div>
+    <div style="padding:0 16px 24px;line-height:1.7;color:var(--text)">
+
+      <div class="div-lbl">Crear un viaje</div>
+      <div class="c-card" style="padding:14px 16px;font-size:0.9rem">
+        1 · Elige la <strong>moneda</strong> del viaje<br>
+        2 · Agrega los <strong>nombres</strong> de los viajeros (mín. 2, máx. 8)<br>
+        3 · Escribe el <strong>nombre del viaje</strong><br>
+        4 · Toca <strong>Crear viaje</strong> → recibirás un código de 6 letras
+      </div>
+
+      <div class="div-lbl">Unirse a un viaje</div>
+      <div class="c-card" style="padding:14px 16px;font-size:0.9rem">
+        1 · Pide el <strong>código de 6 letras</strong> a quien creó el viaje<br>
+        2 · Toca <strong>Unirse</strong> en la pantalla de inicio<br>
+        3 · Ingresa el código y <strong>tu nombre exacto</strong><br>
+        4 · Toca <strong>Unirse →</strong>
+      </div>
+
+      <div class="div-lbl">Registrar un gasto</div>
+      <div class="c-card" style="padding:14px 16px;font-size:0.9rem">
+        1 · Toca el botón <strong>＋</strong> arriba a la derecha<br>
+        2 · Completa descripción, categoría, fecha y valor<br>
+        3 · Elige la <strong>moneda</strong> en que pagas (se convierte automáticamente)<br>
+        4 · Indica <strong>quién pagó</strong> y si es <strong>Propio</strong> o <strong>Compartido</strong><br>
+        5 · Toca <strong>Registrar Gasto</strong>
+      </div>
+
+      <div class="div-lbl">Tipos de gasto</div>
+      <div class="c-card" style="padding:14px 16px;font-size:0.9rem">
+        <strong>Propio</strong> — solo le corresponde a quien pagó<br>
+        <strong>Compartido</strong> — se divide en partes iguales entre todos los viajeros
+      </div>
+
+      <div class="div-lbl">Resumen y liquidación</div>
+      <div class="c-card" style="padding:14px 16px;font-size:0.9rem">
+        En la pestaña <strong>Resumen</strong> verás quién le debe a quién y cuánto.<br>
+        Puedes cambiar la moneda de visualización con el selector arriba.<br>
+        Toca <strong>📥 DESCARGAR EXCEL</strong> para exportar todos los gastos.
+      </div>
+
+      <div class="div-lbl">Conversor de monedas</div>
+      <div class="c-card" style="padding:14px 16px;font-size:0.9rem">
+        Disponible en la pestaña <strong>💱 Cambio</strong> o en el acordeón de la pantalla de inicio.<br>
+        Soporta 45+ monedas con tasas de referencia.
+      </div>
+
+      <div class="div-lbl">Instalar en tu teléfono</div>
+      <div class="c-card" style="padding:14px 16px;font-size:0.9rem">
+        <strong>iPhone:</strong> Safari → botón compartir ↑ → "Añadir a pantalla de inicio"<br>
+        <strong>Android:</strong> Chrome → ⋮ → "Añadir a pantalla de inicio"
+      </div>
+
+      <div class="div-lbl">Notas importantes</div>
+      <div class="c-card" style="padding:14px 16px;font-size:0.9rem;color:var(--text2)">
+        · Se necesita internet para registrar gastos<br>
+        · Los datos se sincronizan en tiempo real entre todos los dispositivos<br>
+        · Al <strong>Salir</strong> puedes volver a unirte con el mismo código<br>
+        · <strong>Eliminar viaje</strong> borra todo permanentemente — ¡no se puede deshacer!
+      </div>
+
+    </div>
+    <div class="spacer"></div>
+  </div>
+
   <div class="nav">
     <button class="nav-item" onclick="irA('viajes',this)">
       <span class="ni">🗺️</span><span class="nl">Viajes</span>
@@ -858,6 +950,9 @@ input[type="number"]::-webkit-inner-spin-button { display: none; }
     </button>
     <button class="nav-item" onclick="irA('conversor',this)">
       <span class="ni">💱</span><span class="nl">Cambio</span>
+    </button>
+    <button class="nav-item" onclick="irA('ayuda',this)">
+      <span class="ni">❓</span><span class="nl">Ayuda</span>
     </button>
   </div>
 </div>
@@ -1276,6 +1371,10 @@ function lanzarApp() {
 }
 
 function actualizarUI() {
+  // Resetear selector moneda resumen al cambiar viaje
+  monedaResumen = null;
+  const selR = document.getElementById('selMonedaResumen');
+  if (selR) selR.value = '';
   document.getElementById('topTrip').textContent   = '✈ ' + S.viaje;
   document.getElementById('cfgViaje').textContent  = S.viaje;
   document.getElementById('cfgU1').textContent     = S.u1;
@@ -1328,7 +1427,14 @@ function renderViajes() {
 
   el.innerHTML = lista.map(v => {
     const activo = v.codigo === S.codigo;
-    const total = fmtCOP(v.ultimoTotal || 0);
+    // Usar moneda del viaje en la tarjeta, no la del viaje activo
+    const mBase = v.monedaBase || 'COP';
+    const symsV = {COP:'$',USD:'US$',EUR:'€',GBP:'£',ARS:'$',CLP:'$',MXN:'$',PEN:'S/',BRL:'R$',JPY:'¥'};
+    const sinDecV = ['COP','CLP','ARS','MXN','JPY','KRW','IDR','PYG','NGN','HUF'];
+    const sym = (symsV[mBase]||mBase) + ' ';
+    const dec = sinDecV.includes(mBase) ? 0 : 2;
+    const totalNum = parseFloat(v.ultimoTotal || 0);
+    const total = sym + totalNum.toLocaleString('es-CL', {minimumFractionDigits:dec, maximumFractionDigits:dec});
     return `
     <div class="viaje-card${activo ? ' activo' : ''}" onclick="cambiarViaje('${v.codigo}')">
       ${activo ? '<span class="vc-badge">Activo</span>' : ''}
@@ -1604,8 +1710,8 @@ function renderDashboard() {
     const cls = bal[v] >= 0 ? 'c-ok' : 'c-owe';
     return `<div class="dash-user">
       <div class="du-name">${escH(v)}</div>
-      <div class="du-stat"><div class="du-lbl">Pagó</div><div class="du-val">${fmtCOP(pago[v])}</div></div>
-      <div class="du-stat"><div class="du-lbl">Corresponde</div><div class="du-val">${fmtCOP(corr[v])}</div></div>
+      <div class="du-stat"><div class="du-lbl">Pagó</div><div class="du-val">${_fmtVista(pago[v])}</div></div>
+      <div class="du-stat"><div class="du-lbl">Corresponde</div><div class="du-val">${_fmtVista(corr[v])}</div></div>
       <div class="du-stat"><div class="du-lbl">Balance</div><div class="du-val du-bal ${cls}">${fmtBal(bal[v])}</div></div>
     </div>`;
   }).join('');
@@ -1744,6 +1850,37 @@ function calcularConversor() {
   tasa.textContent = '1 ' + de + ' = ' + tasaUnit.toLocaleString('es-CL', {minimumFractionDigits:decT, maximumFractionDigits:decT}) + ' ' + a;
 }
 
+var monedaResumen = null;
+
+function cambiarMonedaResumen(val) {
+  monedaResumen = val || null;
+  renderResumen();
+}
+
+function _monedaVista() {
+  return monedaResumen || S.monedaBase || 'COP';
+}
+
+function _convertirVista(valor) {
+  var base = S.monedaBase || 'COP';
+  var dest = _monedaVista();
+  if (dest === base) return valor;
+  var rBase = FALLBACK_USD[base] || 1;
+  var rDest = FALLBACK_USD[dest] || 1;
+  return valor / rBase * rDest;
+}
+
+function _fmtVista(n) {
+  var m    = _monedaVista();
+  var syms = {COP:'$',USD:'US$',EUR:'€',GBP:'£',ARS:'$',CLP:'$',MXN:'$',PEN:'S/',BRL:'R$',JPY:'¥',CHF:'Fr',CAD:'CA$',AUD:'A$'};
+  var sinD = ['COP','CLP','ARS','MXN','JPY','KRW','IDR','PYG','NGN','HUF'];
+  var sym  = (syms[m]||m) + ' ';
+  var dec  = sinD.includes(m) ? 0 : 2;
+  var abs  = Math.abs(_convertirVista(n)).toFixed(dec);
+  var miles = Number(abs).toLocaleString('es-CL', {minimumFractionDigits:dec});
+  return n < 0 ? '('+sym+miles+')' : sym+miles;
+}
+
 function renderResumen() {
   const el = document.getElementById('resumenHTML');
   const gastos = Object.values(S.gastos);
@@ -1793,7 +1930,7 @@ function renderResumen() {
     : tf.map(t => `<div class="bal-card owe"><div class="bal-icon">💸</div>
        <div class="bal-body"><div class="bal-lbl">Liquidación pendiente</div>
        <div class="bal-msg"><strong>${escH(t.de)}</strong> le debe<br>
-       <span class="bal-num c-owe">${fmtCOP(t.m)}</span>
+       <span class="bal-num c-owe">${_fmtVista(t.m)}</span>
        a <strong>${escH(t.a)}</strong></div></div></div>`).join('');
 
   const cats = {};
@@ -1807,7 +1944,7 @@ function renderResumen() {
         <div class="cat-name">${escH(cat.replace(/^[^\s]+\s/,''))}</div>
         <div class="cat-bar-bg"><div class="cat-bar" style="width:${pct.toFixed(1)}%"></div></div>
       </div>
-      <div class="cat-right"><div class="cat-val">${fmtCOP(val)}</div><div class="cat-pct">${pct.toFixed(1)}%</div></div>
+      <div class="cat-right"><div class="cat-val">${_fmtVista(val)}</div><div class="cat-pct">${pct.toFixed(1)}%</div></div>
     </div>`;
   }).join('');
 
@@ -1815,8 +1952,8 @@ function renderResumen() {
     const cls = bal[v] >= 0 ? 'c-ok' : 'c-owe';
     return `<div class="u-blk">
       <div class="u-name">${escH(v)}</div>
-      <div class="u-stat"><div class="u-stat-l">Pagó</div><div class="u-stat-v">${fmtCOP(pago[v])}</div></div>
-      <div class="u-stat"><div class="u-stat-l">Le corresponde</div><div class="u-stat-v">${fmtCOP(corr[v])}</div></div>
+      <div class="u-stat"><div class="u-stat-l">Pagó</div><div class="u-stat-v">${_fmtVista(pago[v])}</div></div>
+      <div class="u-stat"><div class="u-stat-l">Le corresponde</div><div class="u-stat-v">${_fmtVista(corr[v])}</div></div>
       <div class="u-stat"><div class="u-stat-l">Balance</div><div class="u-stat-v u-bal ${cls}">${fmtBal(bal[v])}</div></div>
     </div>`;
   }).join('');
@@ -1824,7 +1961,7 @@ function renderResumen() {
   el.innerHTML = `
     <div class="hero-card">
       <div class="hero-lbl">Total del viaje</div>
-      <div class="hero-amt">${fmtCOP(total)}</div>
+      <div class="hero-amt">${_fmtVista(total)}</div>
       <div class="hero-sub">${gastos.length} gasto${gastos.length===1?'':'s'} · ${n} viajero${n===1?'':'s'}</div>
     </div>
     ${balHtml}
