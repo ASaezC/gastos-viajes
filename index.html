@@ -731,12 +731,14 @@ const CAT_ICONS = {
 //  STATE
 // ═══════════════════════════════════════════════════════
 let S = {
-  codigo: null,   // 6-letter trip code (= Firebase key)
+  codigo: null,
   viaje:  null,
   u1:     null,
   u2:     null,
-  yo:     null,   // my name in this session
-  gastos: {},     // { fbKey: {desc,cat,fecha,valor,pago,tipo,ts} }
+  yo:     null,
+  monedaBase: 'COP',
+  extraViajeros: [],
+  gastos: {},
   unsubscribe: null,
 };
 let editKey  = null;  // Firebase key of gasto being edited
@@ -889,9 +891,10 @@ function crearViaje() {
   const u1 = nombres[0], u2 = nombres[1];
   const extraViajeros = nombres.slice(2);
 
-  set(ref(db, `viajes/${codigo}`), { viaje, u1, u2, extraViajeros, creadoEn: Date.now() })
+  const monedaBase = document.getElementById('sMoneda') ? (document.getElementById('sMoneda').value || 'COP') : 'COP';
+  set(ref(db, `viajes/${codigo}`), { viaje, u1, u2, extraViajeros, monedaBase, creadoEn: Date.now() })
     .then(() => {
-      Object.assign(S, { codigo, viaje, u1, u2, extraViajeros, yo: u1 });
+      Object.assign(S, { codigo, viaje, u1, u2, extraViajeros, monedaBase, yo: u1 });
       saveSession();
       lanzarApp();
     })
