@@ -509,6 +509,39 @@ input[type="number"]::-webkit-inner-spin-button { display: none; }
       <button class="setup-btn" style="flex:1" onclick="crearViaje()">Crear viaje</button>
       <button class="setup-btn" style="flex:0.7;background:transparent;border:2px solid var(--gold);color:var(--gold-l)" onclick="mostrarUnirse()">Unirse</button>
     </div>
+
+    <!-- Acordeón Conversor en pantalla inicio -->
+    <button class="acord-btn" style="margin-top:12px" onclick="toggleAcord('acordConvInicio',this)">
+      <span>💱 Conversor de monedas</span><span class="acord-arrow">▼</span>
+    </button>
+    <div id="acordConvInicio" class="acord-body" style="display:none;padding:4px 0">
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
+        <input id="convMontoI" type="number" placeholder="Monto" inputmode="decimal"
+          style="flex:1;background:var(--bg3);border:1px solid var(--line);border-radius:10px;color:var(--text1);font-family:'IBM Plex Mono',monospace;font-size:1rem;padding:10px 12px"
+          oninput="calcConvInicio()">
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
+        <select id="convDeI" onchange="calcConvInicio()"
+          style="flex:1;background:var(--bg3);border:1px solid var(--line);border-radius:10px;color:var(--text1);font-family:'IBM Plex Mono',monospace;font-size:0.9rem;padding:10px 12px">
+          <option value="USD">USD</option><option value="EUR">EUR</option>
+          <option value="CLP">CLP</option><option value="COP">COP</option>
+          <option value="ARS">ARS</option><option value="MXN">MXN</option>
+          <option value="PEN">PEN</option><option value="BRL">BRL</option>
+          <option value="GBP">GBP</option><option value="JPY">JPY</option>
+        </select>
+        <span style="color:var(--text2);font-size:1.2rem">→</span>
+        <select id="convAI" onchange="calcConvInicio()"
+          style="flex:1;background:var(--bg3);border:1px solid var(--line);border-radius:10px;color:var(--text1);font-family:'IBM Plex Mono',monospace;font-size:0.9rem;padding:10px 12px">
+          <option value="CLP">CLP</option><option value="COP">COP</option>
+          <option value="USD">USD</option><option value="EUR">EUR</option>
+          <option value="ARS">ARS</option><option value="MXN">MXN</option>
+          <option value="PEN">PEN</option><option value="BRL">BRL</option>
+          <option value="GBP">GBP</option><option value="JPY">JPY</option>
+        </select>
+      </div>
+      <div id="convResI" style="text-align:center;font-size:1.6rem;font-family:'Playfair Display',serif;color:var(--gold-l);padding:8px 0">—</div>
+      <div id="convTasaI" style="text-align:center;font-size:0.75rem;color:var(--text2);padding-bottom:8px"></div>
+    </div>
   </div>
 
   <!-- Panel Unirse -->
@@ -1433,6 +1466,26 @@ function exportarExcel() {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
   showToast('Descargando CSV');
+}
+
+function calcConvInicio() {
+  var monto = parseFloat(document.getElementById('convMontoI').value) || 0;
+  var de    = document.getElementById('convDeI').value;
+  var a     = document.getElementById('convAI').value;
+  var res   = document.getElementById('convResI');
+  var tasa  = document.getElementById('convTasaI');
+  if (monto === 0) { res.textContent = '—'; tasa.textContent = ''; return; }
+  var rates = FALLBACK_USD;
+  var rDe = rates[de] || 1;
+  var rA  = rates[a]  || 1;
+  var resultado = monto / rDe * rA;
+  var syms = {COP:'$',USD:'US$',EUR:'€',GBP:'£',ARS:'$',CLP:'$',MXN:'$',PEN:'S/',BRL:'R$',JPY:'¥'};
+  var sinDec = ['COP','CLP','ARS','MXN','JPY'];
+  var dec = sinDec.indexOf(a) >= 0 ? 0 : 2;
+  res.textContent = (syms[a]||a) + ' ' + resultado.toLocaleString('es-CL',{minimumFractionDigits:dec,maximumFractionDigits:dec});
+  var t = (1/rDe*rA);
+  var dT = sinDec.indexOf(a) >= 0 ? 0 : 4;
+  tasa.textContent = '1 ' + de + ' = ' + t.toLocaleString('es-CL',{minimumFractionDigits:dT,maximumFractionDigits:dT}) + ' ' + a;
 }
 
 function calcularConversor() {
