@@ -1429,16 +1429,18 @@ function guardar() {
   })();
 
   if (editKey) {
-    const tsOrig = S.gastos[editKey]?.ts || Date.now();
-    update(ref(db, `gastos/${S.codigo}/${editKey}`), { desc, cat, fecha, valor: valorFinal, pago, tipo, monedaOrig: monedaGasto, valorOrig: valor, ts: tsOrig })
+    const keyActual = editKey;
+    editKey = null; // resetear antes del async
+    const tsOrig = S.gastos[keyActual]?.ts || Date.now();
+    update(ref(db, `gastos/${S.codigo}/${keyActual}`), { desc, cat, fecha, valor: valorFinal, pago, tipo, monedaOrig: monedaGasto, valorOrig: valor, ts: tsOrig })
       .then(() => { showToast('Gasto actualizado ✓'); closeOv('ovForm'); })
-      .catch(() => showToast('Error al actualizar'));
+      .catch(() => { editKey = keyActual; showToast('Error al actualizar — intenta de nuevo'); });
   } else {
+    editKey = null;
     push(ref(db, `gastos/${S.codigo}`), { desc, cat, fecha, valor: valorFinal, pago, tipo, monedaOrig: monedaGasto, valorOrig: valor, ts: Date.now() })
       .then(() => { showToast('Gasto registrado ✓'); closeOv('ovForm'); })
-      .catch(() => showToast('Error al guardar'));
+      .catch(() => showToast('Error al guardar — intenta de nuevo'));
   }
-  editKey = null;
 }
 
 // ═══════════════════════════════════════════════════════
