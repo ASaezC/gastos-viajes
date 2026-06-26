@@ -1371,10 +1371,20 @@ function lanzarApp() {
 }
 
 function actualizarUI() {
-  // Resetear selector moneda resumen al cambiar viaje
+  // Selector resumen muestra moneda base del viaje
   monedaResumen = null;
   const selR = document.getElementById('selMonedaResumen');
-  if (selR) selR.value = '';
+  if (selR) {
+    // Agregar opción de moneda base si no existe
+    const base = S.monedaBase || 'COP';
+    let found = Array.from(selR.options).find(o => o.value === base);
+    if (!found) {
+      const opt = document.createElement('option');
+      opt.value = base; opt.textContent = base + ' — Moneda del viaje';
+      selR.insertBefore(opt, selR.options[1]);
+    }
+    selR.value = base;
+  }
   document.getElementById('topTrip').textContent   = '✈ ' + S.viaje;
   document.getElementById('cfgViaje').textContent  = S.viaje;
   document.getElementById('cfgU1').textContent     = S.u1;
