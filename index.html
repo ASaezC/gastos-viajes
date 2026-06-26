@@ -475,24 +475,12 @@ input[type="number"]::-webkit-inner-spin-button { display: none; }
     <div class="setup-label">Nombre del viaje</div>
     <input class="setup-input" id="sViaje" placeholder="Ej: Roma 2025" maxlength="30">
 
-    <!-- Acordeón Viajeros -->
-    <button class="acord-btn" onclick="toggleAcord('acordViajeros',this)">
-      <span>👥 Viajeros</span><span class="acord-arrow">▼</span>
-    </button>
-    <div id="acordViajeros" class="acord-body" style="display:none">
-      <div id="viajerosLista">
-        <div class="viajero-row"><input class="setup-input viajero-input" placeholder="Tu nombre (Viajero 1)" maxlength="20" value=""></div>
-        <div class="viajero-row"><input class="setup-input viajero-input" placeholder="Viajero 2" maxlength="20" value=""></div>
-      </div>
-      <button class="setup-btn-outline" onclick="agregarViajero()">＋ Agregar viajero</button>
-    </div>
-
-    <!-- Acordeón Moneda -->
-    <button class="acord-btn" onclick="toggleAcord('acordMoneda',this)">
+    <!-- Acordeón Moneda — primero -->
+    <button class="acord-btn" id="btnAcordMoneda" onclick="toggleAcord('acordMoneda',this)">
       <span>💱 Moneda del viaje</span><span class="acord-arrow">▼</span>
     </button>
     <div id="acordMoneda" class="acord-body" style="display:none">
-      <select class="setup-input" id="sMoneda" onchange="monedaSeleccionada=this.value">
+      <select class="setup-input" id="sMoneda" onchange="monedaSeleccionada=this.value;document.getElementById('btnAcordMoneda').querySelectorAll('span')[0].textContent='💱 Moneda: '+this.value">
         <option value="COP">🇨🇴 COP — Peso colombiano</option>
         <option value="USD">🇺🇸 USD — Dólar</option>
         <option value="EUR">🇪🇺 EUR — Euro</option>
@@ -502,6 +490,18 @@ input[type="number"]::-webkit-inner-spin-button { display: none; }
         <option value="PEN">🇵🇪 PEN — Sol</option>
         <option value="BRL">🇧🇷 BRL — Real</option>
       </select>
+    </div>
+
+    <!-- Acordeón Viajeros — segundo -->
+    <button class="acord-btn" onclick="abrirViajeros(this)">
+      <span>👥 Viajeros</span><span class="acord-arrow">▼</span>
+    </button>
+    <div id="acordViajeros" class="acord-body" style="display:none">
+      <div id="viajerosLista">
+        <div class="viajero-row"><input class="setup-input viajero-input" placeholder="Tu nombre (Viajero 1)" maxlength="20" value=""></div>
+        <div class="viajero-row"><input class="setup-input viajero-input" placeholder="Viajero 2" maxlength="20" value=""></div>
+      </div>
+      <button class="setup-btn-outline" onclick="agregarViajero()">＋ Agregar viajero</button>
     </div>
 
     <div class="setup-info" style="margin-top:10px">Se generará un código de 6 letras para compartir.</div>
@@ -887,6 +887,18 @@ function toggleAcord(id, btn) {
   var open = body.style.display !== 'none';
   body.style.display = open ? 'none' : 'block';
   btn.classList.toggle('open', !open);
+}
+
+function abrirViajeros(btn) {
+  if (monedaSeleccionada === 'COP' && document.getElementById('acordMoneda').style.display === 'none') {
+    showToast('Primero elige la moneda del viaje ☝');
+    // Abrir acordeón moneda automáticamente
+    var btnMoneda = document.getElementById('btnAcordMoneda');
+    document.getElementById('acordMoneda').style.display = 'block';
+    btnMoneda.classList.add('open');
+    return;
+  }
+  toggleAcord('acordViajeros', btn);
 }
 
 function agregarViajero() {
