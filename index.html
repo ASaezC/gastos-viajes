@@ -1065,8 +1065,18 @@ function whenFB(fn) {
   let intentos = 0;
   const t = setInterval(() => {
     intentos++;
-    if (window.FB_READY) { clearInterval(t); fn(); }
-    else if (intentos > 50) { clearInterval(t); fn(); } // 5 seg máximo
+    if (window.FB_READY) {
+      clearInterval(t);
+      fn();
+    } else if (intentos > 50) {
+      clearInterval(t);
+      // Firebase no conectó — mostrar error en lugar de ejecutar con datos vacíos
+      const ov = document.getElementById('loadingOv');
+      if (ov) {
+        const msg = ov.querySelector('.loading-msg');
+        if (msg) msg.textContent = 'Sin conexión. Verifica tu internet e intenta de nuevo.';
+      }
+    }
   }, 100);
 }
 
