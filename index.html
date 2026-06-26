@@ -1213,8 +1213,19 @@ function unirseViaje() {
   get(ref(db, `viajes/${codigo}`)).then(snap => {
     if (!snap.exists()) { showToast('Código no encontrado'); return; }
     const d = snap.val();
-    const miNombre = yo.toLowerCase() === d.u2.toLowerCase() ? d.u2 : d.u1;
-    Object.assign(S, { codigo, viaje: d.viaje, u1: d.u1, u2: d.u2, yo: miNombre });
+    // Buscar nombre exacto entre todos los viajeros
+    const todos = [d.u1, d.u2, ...(d.extraViajeros || [])].filter(Boolean);
+    const match = todos.find(v => v.toLowerCase() === yo.toLowerCase());
+    const miNombre = match || yo;
+    Object.assign(S, {
+      codigo,
+      viaje: d.viaje,
+      u1: d.u1,
+      u2: d.u2,
+      extraViajeros: d.extraViajeros || [],
+      monedaBase: d.monedaBase || 'COP',
+      yo: miNombre
+    });
     saveSession();
     lanzarApp();
   }).catch(() => showToast('No se pudo conectar. Verifica el código.'));
