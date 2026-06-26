@@ -880,7 +880,7 @@ function genCodigo() {
 // ═══════════════════════════════════════════════════════
 //  CREAR VIAJE
 // ═══════════════════════════════════════════════════════
-var monedaSeleccionada = 'COP';
+var monedaSeleccionada = null; // null = no elegida aún
 
 function toggleAcord(id, btn) {
   var body = document.getElementById(id);
@@ -890,13 +890,12 @@ function toggleAcord(id, btn) {
 }
 
 function abrirViajeros(btn) {
-  if (monedaSeleccionada === 'COP' && document.getElementById('acordMoneda').style.display === 'none') {
+  if (!monedaSeleccionada) {
     showToast('Primero elige la moneda del viaje ☝');
-    // Abrir acordeón moneda automáticamente
     var btnMoneda = document.getElementById('btnAcordMoneda');
     document.getElementById('acordMoneda').style.display = 'block';
     btnMoneda.classList.add('open');
-    return;
+    return; // bloquea — no abre Viajeros
   }
   toggleAcord('acordViajeros', btn);
 }
@@ -919,6 +918,7 @@ function crearViaje() {
   const nombres = Array.from(inputs).map(i => i.value.trim()).filter(Boolean);
 
   if (!viaje) { showToast('Falta el nombre del viaje'); return; }
+  if (!monedaSeleccionada) { showToast('Elige la moneda del viaje'); return; }
   if (nombres.length < 2) { showToast('Agrega al menos 2 viajeros'); return; }
 
   if (!firebaseConfigurado()) {
@@ -934,7 +934,7 @@ function crearViaje() {
   const u1 = nombres[0], u2 = nombres[1];
   const extraViajeros = nombres.slice(2);
 
-  const monedaBase = monedaSeleccionada || 'COP';
+  const monedaBase = monedaSeleccionada;
   set(ref(db, `viajes/${codigo}`), { viaje, u1, u2, extraViajeros, monedaBase, creadoEn: Date.now() })
     .then(() => {
       Object.assign(S, { codigo, viaje, u1, u2, extraViajeros, monedaBase, yo: u1 });
