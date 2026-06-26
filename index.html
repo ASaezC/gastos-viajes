@@ -1101,11 +1101,11 @@ function guardar() {
 
   const { db, ref, push, update } = window.FB;
 
-  // Convertir valor a moneda base del viaje
+  // Convertir valor a moneda base del viaje (solo FALLBACK_USD — sin API)
   const base = S.monedaBase || 'COP';
   const valorBase = monedaGasto === base ? valor : (() => {
-    const rOrigen = tasasUSD[monedaGasto] || FALLBACK_USD[monedaGasto] || 1;
-    const rBase   = tasasUSD[base]        || FALLBACK_USD[base]        || 1;
+    const rOrigen = FALLBACK_USD[monedaGasto] || 1;
+    const rBase   = FALLBACK_USD[base]        || 1;
     return valor / rOrigen * rBase;
   })();
   const valorFinal = Math.round(valorBase * 100) / 100;
