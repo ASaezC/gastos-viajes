@@ -609,6 +609,57 @@ input[type="number"]::-webkit-inner-spin-button { display: none; }
     <div class="spacer"></div>
   </div>
 
+  <!-- SCREEN CONVERSOR -->
+  <div class="screen" id="sc-conversor">
+    <div class="sec-head"><span class="sec-title">Conversor</span></div>
+    <div style="padding:16px">
+      <div class="c-card">
+        <div class="c-row">
+          <span class="c-lbl" style="flex-shrink:0">Monto</span>
+          <input id="convMonto" type="number" placeholder="0" inputmode="decimal"
+            style="min-width:0;flex:1" oninput="calcularConversor()">
+        </div>
+        <div class="c-row">
+          <span class="c-lbl" style="flex-shrink:0">De</span>
+          <select id="convDe" onchange="calcularConversor()"
+            style="flex:1;background:var(--card);border:none;color:var(--text1);font-family:'IBM Plex Mono',monospace;font-size:0.95rem">
+            <option value="USD">USD — Dólar</option>
+            <option value="EUR">EUR — Euro</option>
+            <option value="CLP">CLP — Peso chileno</option>
+            <option value="COP">COP — Peso colombiano</option>
+            <option value="ARS">ARS — Peso argentino</option>
+            <option value="MXN">MXN — Peso mexicano</option>
+            <option value="PEN">PEN — Sol</option>
+            <option value="BRL">BRL — Real</option>
+            <option value="GBP">GBP — Libra</option>
+            <option value="JPY">JPY — Yen</option>
+          </select>
+        </div>
+        <div class="c-row">
+          <span class="c-lbl" style="flex-shrink:0">A</span>
+          <select id="convA" onchange="calcularConversor()"
+            style="flex:1;background:var(--card);border:none;color:var(--text1);font-family:'IBM Plex Mono',monospace;font-size:0.95rem">
+            <option value="CLP">CLP — Peso chileno</option>
+            <option value="COP">COP — Peso colombiano</option>
+            <option value="USD">USD — Dólar</option>
+            <option value="EUR">EUR — Euro</option>
+            <option value="ARS">ARS — Peso argentino</option>
+            <option value="MXN">MXN — Peso mexicano</option>
+            <option value="PEN">PEN — Sol</option>
+            <option value="BRL">BRL — Real</option>
+            <option value="GBP">GBP — Libra</option>
+            <option value="JPY">JPY — Yen</option>
+          </select>
+        </div>
+      </div>
+      <div id="convResultado" style="text-align:center;padding:24px 0;font-family:'Playfair Display',serif;font-size:2rem;color:var(--gold-l)">
+        —
+      </div>
+      <div id="convTasa" style="text-align:center;font-size:0.8rem;color:var(--text2);margin-top:-16px"></div>
+    </div>
+    <div class="spacer"></div>
+  </div>
+
   <div class="nav">
     <button class="nav-item" onclick="irA('viajes',this)">
       <span class="ni">🗺️</span><span class="nl">Viajes</span>
@@ -621,6 +672,9 @@ input[type="number"]::-webkit-inner-spin-button { display: none; }
     </button>
     <button class="nav-item" onclick="irA('config',this)">
       <span class="ni">⚙️</span><span class="nl">Config</span>
+    </button>
+    <button class="nav-item" onclick="irA('conversor',this)">
+      <span class="ni">💱</span><span class="nl">Cambio</span>
     </button>
   </div>
 </div>
@@ -1379,6 +1433,32 @@ function exportarExcel() {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
   showToast('Descargando CSV');
+}
+
+function calcularConversor() {
+  var monto = parseFloat(document.getElementById('convMonto').value) || 0;
+  var de    = document.getElementById('convDe').value;
+  var a     = document.getElementById('convA').value;
+  var res   = document.getElementById('convResultado');
+  var tasa  = document.getElementById('convTasa');
+
+  if (monto === 0) { res.textContent = '—'; tasa.textContent = ''; return; }
+  if (de === a)    { res.textContent = monto; tasa.textContent = 'Misma moneda'; return; }
+
+  var rates = (typeof tasasUSD !== 'undefined' && Object.keys(tasasUSD).length > 0) ? tasasUSD : FALLBACK_USD;
+  var rDe = rates[de] || FALLBACK_USD[de] || 1;
+  var rA  = rates[a]  || FALLBACK_USD[a]  || 1;
+  var resultado = monto / rDe * rA;
+
+  var syms = {COP:'$',USD:'US$',EUR:'€',GBP:'£',ARS:'$',CLP:'$',MXN:'$',PEN:'S/',BRL:'R$',JPY:'¥'};
+  var sinDec = ['COP','CLP','ARS','MXN','JPY'];
+  var dec = sinDec.indexOf(a) >= 0 ? 0 : 2;
+  var sym = (syms[a] || a) + ' ';
+  res.textContent = sym + resultado.toLocaleString('es-CL', {minimumFractionDigits:dec, maximumFractionDigits:dec});
+
+  var tasaUnit = (1 / rDe * rA);
+  var decT = sinDec.indexOf(a) >= 0 ? 0 : 4;
+  tasa.textContent = '1 ' + de + ' = ' + tasaUnit.toLocaleString('es-CL', {minimumFractionDigits:decT, maximumFractionDigits:decT}) + ' ' + a;
 }
 
 function renderResumen() {
