@@ -1097,7 +1097,13 @@ function saveSession() {
 function loadSession() {
   try {
     const d = JSON.parse(localStorage.getItem('gv3') || 'null');
-    if (d && d.codigo) { Object.assign(S, d); return true; }
+    if (d && d.codigo) {
+      Object.assign(S, d);
+      // Garantizar tipos correctos independiente de versión de sesión
+      if (!Array.isArray(S.extraViajeros)) S.extraViajeros = [];
+      if (!S.monedaBase) S.monedaBase = 'COP';
+      return true;
+    }
   } catch(e) {}
   return false;
 }
