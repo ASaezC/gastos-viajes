@@ -386,6 +386,16 @@ input[type="number"]::-webkit-inner-spin-button { display: none; }
   color: var(--text2); cursor: pointer; padding: 6px 10px; font-size: 1rem;
   flex-shrink: 0;
 }
+.acord-btn {
+  width:100%; display:flex; justify-content:space-between; align-items:center;
+  background:var(--bg3); border:1px solid var(--line); border-radius:12px;
+  color:var(--gold-l); font-family:'IBM Plex Mono',monospace; font-size:0.9rem;
+  letter-spacing:1px; padding:14px 16px; cursor:pointer; margin-bottom:6px;
+  touch-action:manipulation;
+}
+.acord-arrow { transition:transform 0.2s; }
+.acord-btn.open .acord-arrow { transform:rotate(180deg); }
+.acord-body { margin-bottom:8px; }
 .setup-btn-outline {
   width: 100%; padding: 13px; margin-bottom: 10px;
   background: none; border: 1px dashed rgba(201,146,42,0.4);
@@ -464,25 +474,38 @@ input[type="number"]::-webkit-inner-spin-button { display: none; }
   <div id="panelCrear">
     <div class="setup-label">Nombre del viaje</div>
     <input class="setup-input" id="sViaje" placeholder="Ej: Roma 2025" maxlength="30">
-    <div class="setup-label">Viajeros</div>
-    <div id="viajerosLista">
-      <div class="viajero-row"><input class="setup-input viajero-input" placeholder="Tu nombre (Viajero 1)" maxlength="20" value=""></div>
-      <div class="viajero-row"><input class="setup-input viajero-input" placeholder="Viajero 2" maxlength="20" value=""></div>
+
+    <!-- Acordeón Viajeros -->
+    <button class="acord-btn" onclick="toggleAcord('acordViajeros',this)">
+      <span>👥 Viajeros</span><span class="acord-arrow">▼</span>
+    </button>
+    <div id="acordViajeros" class="acord-body" style="display:none">
+      <div id="viajerosLista">
+        <div class="viajero-row"><input class="setup-input viajero-input" placeholder="Tu nombre (Viajero 1)" maxlength="20" value=""></div>
+        <div class="viajero-row"><input class="setup-input viajero-input" placeholder="Viajero 2" maxlength="20" value=""></div>
+      </div>
+      <button class="setup-btn-outline" onclick="agregarViajero()">＋ Agregar viajero</button>
     </div>
-    <button class="setup-btn-outline" onclick="agregarViajero()">＋ Agregar viajero</button>
-    <div class="setup-label">Moneda del viaje</div>
-    <select class="setup-input" id="sMoneda">
-      <option value="COP">🇨🇴 COP — Peso colombiano</option>
-      <option value="USD">🇺🇸 USD — Dólar</option>
-      <option value="EUR">🇪🇺 EUR — Euro</option>
-      <option value="ARS">🇦🇷 ARS — Peso argentino</option>
-      <option value="CLP">🇨🇱 CLP — Peso chileno</option>
-      <option value="MXN">🇲🇽 MXN — Peso mexicano</option>
-      <option value="PEN">🇵🇪 PEN — Sol</option>
-      <option value="BRL">🇧🇷 BRL — Real</option>
-    </select>
-    <div class="setup-info">Se generará un código de 6 letras para compartir.</div>
-    <div style="display:flex;gap:10px;margin-top:4px">
+
+    <!-- Acordeón Moneda -->
+    <button class="acord-btn" onclick="toggleAcord('acordMoneda',this)">
+      <span>💱 Moneda del viaje</span><span class="acord-arrow">▼</span>
+    </button>
+    <div id="acordMoneda" class="acord-body" style="display:none">
+      <select class="setup-input" id="sMoneda">
+        <option value="COP">🇨🇴 COP — Peso colombiano</option>
+        <option value="USD">🇺🇸 USD — Dólar</option>
+        <option value="EUR">🇪🇺 EUR — Euro</option>
+        <option value="ARS">🇦🇷 ARS — Peso argentino</option>
+        <option value="CLP">🇨🇱 CLP — Peso chileno</option>
+        <option value="MXN">🇲🇽 MXN — Peso mexicano</option>
+        <option value="PEN">🇵🇪 PEN — Sol</option>
+        <option value="BRL">🇧🇷 BRL — Real</option>
+      </select>
+    </div>
+
+    <div class="setup-info" style="margin-top:10px">Se generará un código de 6 letras para compartir.</div>
+    <div style="display:flex;gap:10px;margin-top:8px">
       <button class="setup-btn" style="flex:1" onclick="crearViaje()">Crear viaje</button>
       <button class="setup-btn" style="flex:0.7;background:transparent;border:2px solid var(--gold);color:var(--gold-l)" onclick="mostrarUnirse()">Unirse</button>
     </div>
@@ -857,6 +880,13 @@ function genCodigo() {
 // ═══════════════════════════════════════════════════════
 //  CREAR VIAJE
 // ═══════════════════════════════════════════════════════
+function toggleAcord(id, btn) {
+  var body = document.getElementById(id);
+  var open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  btn.classList.toggle('open', !open);
+}
+
 function agregarViajero() {
   const lista = document.getElementById('viajerosLista');
   const total = lista.querySelectorAll('.viajero-input').length;
