@@ -1660,12 +1660,15 @@ function renderGastos() {
 // ═══════════════════════════════════════════════════════
 function exportarExcel() {
   var base = S.monedaBase || 'COP';
-  var gastos = Object.values(S.gastos);
-  var lineas = ['Fecha,Descripcion,Categoria,Quien pago,Tipo,Valor ' + base];
+  var gastos = Object.values(S.gastos).sort(function(a,b) {
+    return (a.fecha||'').localeCompare(b.fecha||'');
+  });
+  var lineas = ['Fecha,Descripcion,Categoria,Quien pago,Tipo,Valor ' + base + ',Moneda original,Valor original'];
   for (var i=0; i<gastos.length; i++) {
     var g = gastos[i];
     var cat = (g.cat || '').replace(/^\S+\s/, '');
-    lineas.push([(g.fecha||''), (g.desc||''), cat, (g.pago||''), (g.tipo||''), (g.valor||0)].join(','));
+    lineas.push([(g.fecha||''), (g.desc||''), cat, (g.pago||''), (g.tipo||''),
+      (g.valor||0), (g.monedaOrig||base), (g.valorOrig!=null?g.valorOrig:g.valor||0)].join(','));
   }
   var txt = lineas.join('\r\n');
   var blob = new Blob(['\uFEFF' + txt], {type: 'text/csv;charset=utf-8;'});
