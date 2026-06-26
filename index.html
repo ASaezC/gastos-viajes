@@ -1322,7 +1322,7 @@ function renderViajes() {
     <div class="viaje-card${activo ? ' activo' : ''}" onclick="cambiarViaje('${v.codigo}')">
       ${activo ? '<span class="vc-badge">Activo</span>' : ''}
       <div class="vc-name">${escH(v.viaje)}</div>
-      <div class="vc-users">${escH(v.u1)} · ${escH(v.u2)}</div>
+      <div class="vc-users">${[v.u1, v.u2, ...(Array.isArray(v.extraViajeros) ? v.extraViajeros : [])].filter(Boolean).map(escH).join(' · ')}</div>
       <div class="vc-total">${total}</div>
       <div class="vc-code">Código: ${v.codigo}</div>
     </div>`;
@@ -1342,7 +1342,16 @@ function cambiarViaje(codigo) {
   if (S.unsubscribe) S.unsubscribe();
   S.gastos = {};
 
-  Object.assign(S, { codigo: v.codigo, viaje: v.viaje, u1: v.u1, u2: v.u2, yo: v.yo || v.u1 });
+  Object.assign(S, {
+    codigo: v.codigo,
+    viaje:  v.viaje,
+    u1:     v.u1,
+    u2:     v.u2,
+    extraViajeros: v.extraViajeros || [],
+    monedaBase:    v.monedaBase    || 'COP',
+    yo:     v.yo || v.u1,
+    gastos: {}
+  });
   saveSession();
   actualizarUI();
   suscribir();
