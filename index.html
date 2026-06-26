@@ -1441,8 +1441,12 @@ function abrirForm(key = null) {
     document.getElementById('fDesc').value  = g.desc  || '';
     document.getElementById('fCat').value   = g.cat   || '';
     document.getElementById('fFecha').value = g.fecha || '';
-    const v = parseFloat(g.valor) || 0;
+    // Mostrar valor original si existe, si no el valor convertido
+    const v = parseFloat(g.valorOrig != null ? g.valorOrig : g.valor) || 0;
     document.getElementById('fValor').value = v > 0 ? String(v) : '';
+    // Restaurar moneda original
+    const selM = document.getElementById('fMoneda');
+    if (selM) selM.value = g.monedaOrig || S.monedaBase || 'COP';
     const selPago = document.getElementById('fPago');
     selPago.value = '';
     Array.from(selPago.options).forEach(o => {
