@@ -1351,14 +1351,24 @@ function cambiarViaje(codigo) {
 }
 
 function nuevoViaje() {
-  // Salir de la app y mostrar setup en modo crear
   if (S.unsubscribe) S.unsubscribe();
+  // Resetear monedaSeleccionada
+  monedaSeleccionada = null;
+  // Resetear acordeones
+  document.getElementById('acordMoneda').style.display = 'none';
+  document.getElementById('btnAcordMoneda').classList.remove('open');
+  document.getElementById('acordViajeros').style.display = 'none';
+  // Resetear campos
+  document.getElementById('sViaje').value = '';
+  // Resetear lista de viajeros a los 2 iniciales
+  const lista = document.getElementById('viajerosLista');
+  if (lista) {
+    lista.innerHTML = '<div class="viajero-row"><input class="setup-input viajero-input" placeholder="Tu nombre (Viajero 1)" maxlength="20"></div>' +
+      '<div class="viajero-row"><input class="setup-input viajero-input" placeholder="Viajero 2" maxlength="20"></div>';
+  }
+  document.getElementById('panelUnir').style.display = 'none';
   document.getElementById('app').style.display = 'none';
   document.getElementById('setup').style.display = 'flex';
-  document.getElementById('panelUnir').style.display = 'none';
-  document.getElementById('sViaje').value = '';
-  document.getElementById('sU1').value = '';
-  document.getElementById('sU2').value = '';
 }
 
 
