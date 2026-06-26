@@ -1414,11 +1414,15 @@ function suscribir() {
       setSyncDot('live');
       const total = Object.values(S.gastos).reduce((s,g) => s+g.valor, 0);
       guardarEnLista({ codigo: S.codigo, viaje: S.viaje, u1: S.u1, u2: S.u2,
-        extraViajeros: S.extraViajeros, yo: S.yo, ultimoTotal: total });
+        extraViajeros: S.extraViajeros, monedaBase: S.monedaBase, yo: S.yo, ultimoTotal: total });
       renderViajes();
       renderGastos();
       renderResumen();
     }, () => setSyncDot('err'));
+  }).catch(e => {
+    setSyncDot('err');
+    showToast('Error al cargar el viaje — verifica tu conexión');
+    console.error('suscribir get error:', e);
   });
 }
 
@@ -1874,11 +1878,33 @@ function closeSw(key) {
 function copiarCodigo() {
   const txt = S.codigo + ' — ' + S.viaje;
   if (navigator.share) {
-    navigator.share({ title: 'Gastos de Viaje', text: `Únete con el código: ${S.codigo}` })
-      .catch(() => {});
+    navigator.share({ title: 'Gastos de Viaje', text: 'Únete con el código: ' + S.codigo })
+      .catch(() => _copiarFallback(txt));
+  } else if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(txt)
+      .then(() => showToast('Código copiado ✓'))
+      .catch(() => _copiarFallback(txt));
   } else {
-    navigator.clipboard.writeText(txt).then(() => showToast('Código copiado ✓'));
+    _copiarFallback(txt);
   }
+}
+
+function _copiarFallback(txt) {
+  // Fallback para iOS Safari sin permisos de clipboard
+  const el = document.createElement('textarea');
+  el.value = txt;
+  el.style.position = 'fixed';
+  el.style.opacity = '0';
+  document.body.appendChild(el);
+  el.focus();
+  el.select();
+  try {
+    document.execCommand('copy');
+    showToast('Código copiado ✓');
+  } catch(e) {
+    showToast('Código: ' + S.codigo);
+  }
+  document.body.removeChild(el);
 }
 
 // ═══════════════════════════════════════════════════════
