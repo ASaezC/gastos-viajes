@@ -1535,15 +1535,17 @@ function renderDashboard() {
   todos.forEach(v => { bal[v] = pago[v] - corr[v]; });
 
   // Liquidación mínima
-  const deu = todos.filter(v => bal[v] < -0.5).map(v => ({ n: v, a: -bal[v] }));
-  const acr = todos.filter(v => bal[v] >  0.5).map(v => ({ n: v, a:  bal[v] }));
+  const sinDecM = ['COP','CLP','ARS','MXN','JPY','KRW','IDR','PYG','NGN','HUF'];
+  const umbral  = sinDecM.includes(S.monedaBase||'COP') ? 1 : 0.01;
+  const deu = todos.filter(v => bal[v] < -umbral).map(v => ({ n: v, a: -bal[v] }));
+  const acr = todos.filter(v => bal[v] >  umbral).map(v => ({ n: v, a:  bal[v] }));
   const tf = []; let di = 0, ai = 0;
   while (di < deu.length && ai < acr.length) {
     const m = Math.min(deu[di].a, acr[ai].a);
     tf.push({ de: deu[di].n, a: acr[ai].n, m });
     deu[di].a -= m; acr[ai].a -= m;
-    if (deu[di].a < 0.5) di++;
-    if (acr[ai].a < 0.5) ai++;
+    if (deu[di].a < umbral) di++;
+    if (acr[ai].a < umbral) ai++;
   }
 
   const balHtml = tf.length === 0
@@ -1726,15 +1728,17 @@ function renderResumen() {
   todos.forEach(v => { bal[v] = pago[v] - corr[v]; });
 
   // Liquidación mínima
-  const deu = todos.filter(v => bal[v] < -0.5).map(v => ({ n: v, a: -bal[v] }));
-  const acr = todos.filter(v => bal[v] >  0.5).map(v => ({ n: v, a:  bal[v] }));
+  const sinDecM = ['COP','CLP','ARS','MXN','JPY','KRW','IDR','PYG','NGN','HUF'];
+  const umbral  = sinDecM.includes(S.monedaBase||'COP') ? 1 : 0.01;
+  const deu = todos.filter(v => bal[v] < -umbral).map(v => ({ n: v, a: -bal[v] }));
+  const acr = todos.filter(v => bal[v] >  umbral).map(v => ({ n: v, a:  bal[v] }));
   const tf = []; let di = 0, ai = 0;
   while (di < deu.length && ai < acr.length) {
     const m = Math.min(deu[di].a, acr[ai].a);
     tf.push({ de: deu[di].n, a: acr[ai].n, m });
     deu[di].a -= m; acr[ai].a -= m;
-    if (deu[di].a < 0.5) di++;
-    if (acr[ai].a < 0.5) ai++;
+    if (deu[di].a < umbral) di++;
+    if (acr[ai].a < umbral) ai++;
   }
 
   const balHtml = tf.length === 0
