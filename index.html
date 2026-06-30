@@ -706,14 +706,16 @@ input[type="number"]::-webkit-inner-spin-button { display: none; }
         <div class="c-row">
           <span class="c-lbl" style="flex-shrink:0">Monto</span>
           <input id="convMonto" type="number" placeholder="0" inputmode="decimal"
-            style="min-width:0;flex:1" oninput="calcularConversor()">
+            style="min-width:0;flex:1;background:var(--bg3);border:1px solid var(--line);
+            border-radius:10px;color:var(--text);font-family:'IBM Plex Mono',monospace;
+            font-size:1.1rem;padding:12px 14px;outline:none" oninput="calcularConversor()">
         </div>
         <div class="c-row">
           <span class="c-lbl" style="flex-shrink:0">De</span>
           <div class="mon-search-wrap" style="flex:1">
             <input id="convDe" class="setup-input" placeholder="País o código, ej: Japón" autocomplete="off"
               style="margin-bottom:0"
-              oninput="buscarMoneda(this.value,'listConvDe',function(el,c,p){document.getElementById('convDe').value=c+' — '+p;document.getElementById('listConvDe').style.display='none';calcularConversor();})">
+              oninput="buscarMoneda(this.value,'listConvDe',function(c,p){document.getElementById('convDe').value=c+' - '+p;calcularConversor();})">
             <div class="mon-list" id="listConvDe"></div>
           </div>
         </div>
@@ -722,7 +724,7 @@ input[type="number"]::-webkit-inner-spin-button { display: none; }
           <div class="mon-search-wrap" style="flex:1">
             <input id="convA" class="setup-input" placeholder="País o código, ej: Chile" autocomplete="off"
               style="margin-bottom:0"
-              oninput="buscarMoneda(this.value,'listConvA',function(el,c,p){document.getElementById('convA').value=c+' — '+p;document.getElementById('listConvA').style.display='none';calcularConversor();})">
+              oninput="buscarMoneda(this.value,'listConvA',function(c,p){document.getElementById('convA').value=c+' - '+p;calcularConversor();})">
             <div class="mon-list" id="listConvA"></div>
           </div>
         </div>
