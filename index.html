@@ -1510,6 +1510,10 @@ function guardar() {
 //  CRUD — ABRIR FORMULARIO
 // ═══════════════════════════════════════════════════════
 function abrirForm(key = null) {
+  // Guardar pantalla activa para restaurarla al cerrar
+  const scActiva = document.querySelector('.screen.on');
+  window._scAnterior = scActiva ? scActiva.id : 'sc-gastos';
+  window._navAnterior = document.querySelector('.nav-item.on');
   editKey = key;
   const es = key !== null;
   document.getElementById('formTitle').textContent   = es ? 'Editar Gasto' : 'Nuevo Gasto';
@@ -1958,7 +1962,16 @@ function irA(nombre, btn) {
 //  MODALS
 // ═══════════════════════════════════════════════════════
 function openOv(id)  { document.getElementById(id).classList.add('on'); }
-function closeOv(id) { document.getElementById(id).classList.remove('on'); }
+function closeOv(id) {
+  document.getElementById(id).classList.remove('on');
+  if (id === 'ovForm' && window._scAnterior) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('on'));
+    const sc = document.getElementById(window._scAnterior);
+    if (sc) sc.classList.add('on');
+    if (window._navAnterior) window._navAnterior.classList.add('on');
+  }
+}
 function closeOvOutside(e, id) { if (e.target.id === id) closeOv(id); }
 
 // ═══════════════════════════════════════════════════════
