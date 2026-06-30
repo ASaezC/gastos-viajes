@@ -459,6 +459,21 @@ input[type="number"]::-webkit-inner-spin-button { display: none; }
 .back-arrow {
   font-size: 1.4rem; line-height: 1;
 }
+
+.mon-search-wrap { position:relative; flex:1; }
+.mon-list {
+  display:none; position:absolute; top:100%; left:0; right:0; z-index:200;
+  background:var(--bg3); border:1px solid var(--gold); border-radius:10px;
+  overflow:hidden; margin-top:2px; box-shadow:0 4px 20px rgba(0,0,0,0.5);
+}
+.mon-item {
+  padding:11px 14px; font-size:0.88rem; cursor:pointer;
+  border-bottom:1px solid var(--line); color:var(--text);
+  touch-action:manipulation;
+}
+.mon-item:last-child { border-bottom:none; }
+.mon-item:active { background:rgba(201,146,42,0.15); }
+
 </style>
 </head>
 <body>
@@ -507,9 +522,16 @@ input[type="number"]::-webkit-inner-spin-button { display: none; }
         <option value="BRL">🇧🇷 BRL — Real</option>
         <option value="OTRA">✏️ Otra moneda…</option>
       </select>
-      <input class="setup-input" id="sMonedaOtra" placeholder="Código de moneda, ej: JPY, CHF, CNY"
-        maxlength="6" style="display:none;text-transform:uppercase;margin-top:8px"
-        oninput="actualizarMonedaOtra()">
+      <div class="mon-search-wrap" style="margin-top:8px">
+      <input class="setup-input" id="sMonedaOtra" placeholder="Buscar: Japon, CHF, Australia..." autocomplete="off"
+        style="margin-bottom:0"
+        oninput="buscarMoneda(this.value,'listMonedaOtra',function(c,p){
+          document.getElementById('sMonedaOtra').value=c+' - '+p;
+          monedaSeleccionada=c;
+          document.getElementById('btnAcordMoneda').querySelectorAll('span')[0].textContent='Moneda: '+c;
+        })">
+      <div class="mon-list" id="listMonedaOtra"></div>
+    </div>
     </div>
 
     <!-- Acordeón Viajeros — segundo -->
@@ -536,25 +558,20 @@ input[type="number"]::-webkit-inner-spin-button { display: none; }
     </button>
     <div id="acordConvInicio" class="acord-body" style="display:none;padding:4px 0">
       <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
-        <input id="convMontoI" type="number" placeholder="Monto" inputmode="decimal"
-          style="flex:1;background:var(--bg3);border:1px solid var(--line);border-radius:10px;color:var(--text1);font-family:'IBM Plex Mono',monospace;font-size:1rem;padding:10px 12px"
-          oninput="calcConvInicio()">
+      <div class="mon-search-wrap">
+        <input id="convDeI" class="setup-input" placeholder="De: USD, Chile..." autocomplete="off"
+          style="margin-bottom:0;padding:10px 10px;font-size:0.88rem"
+          oninput="buscarMoneda(this.value,'listConvDeI',function(c,p){document.getElementById('convDeI').value=c+' - '+p;calcConvInicio();})">
+        <div class="mon-list" id="listConvDeI"></div>
       </div>
-      <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
-        <div class="mon-search-wrap" style="flex:1">
-          <input id="convDeI" class="setup-input" placeholder="De: USD, Euro…" autocomplete="off"
-            style="margin-bottom:0;padding:10px 10px;font-size:0.88rem"
-            oninput="buscarMoneda(this.value,'listConvDeI',function(el,c,p){document.getElementById('convDeI').value=c+' — '+p;document.getElementById('listConvDeI').style.display='none';calcConvInicio();})">
-          <div class="mon-list" id="listConvDeI"></div>
-        </div>
-        <span style="color:var(--text2);font-size:1.2rem;flex-shrink:0">→</span>
-        <div class="mon-search-wrap" style="flex:1">
-          <input id="convAI" class="setup-input" placeholder="A: CLP, Yen…" autocomplete="off"
-            style="margin-bottom:0;padding:10px 10px;font-size:0.88rem"
-            oninput="buscarMoneda(this.value,'listConvAI',function(el,c,p){document.getElementById('convAI').value=c+' — '+p;document.getElementById('listConvAI').style.display='none';calcConvInicio();})">
-          <div class="mon-list" id="listConvAI"></div>
-        </div>
+      <span style="color:var(--text2);font-size:1.2rem;flex-shrink:0">&#8594;</span>
+      <div class="mon-search-wrap">
+        <input id="convAI" class="setup-input" placeholder="A: EUR, Japon..." autocomplete="off"
+          style="margin-bottom:0;padding:10px 10px;font-size:0.88rem"
+          oninput="buscarMoneda(this.value,'listConvAI',function(c,p){document.getElementById('convAI').value=c+' - '+p;calcConvInicio();})">
+        <div class="mon-list" id="listConvAI"></div>
       </div>
+    </div>
       <div id="convResI" style="text-align:center;font-size:1.6rem;font-family:'Playfair Display',serif;color:var(--gold-l);padding:8px 0">—</div>
       <div id="convTasaI" style="text-align:center;font-size:0.75rem;color:var(--text2);padding-bottom:8px"></div>
     </div>
@@ -1708,10 +1725,59 @@ function exportarExcel() {
   showToast('Descargando CSV');
 }
 
+
+var MONEDAS_DB = [
+  {c:'USD',p:'Estados Unidos'},{c:'EUR',p:'Eurozona'},
+  {c:'GBP',p:'Reino Unido'},{c:'JPY',p:'Japon'},
+  {c:'CHF',p:'Suiza'},{c:'CAD',p:'Canada'},
+  {c:'AUD',p:'Australia'},{c:'NZD',p:'Nueva Zelanda'},
+  {c:'CNY',p:'China'},{c:'HKD',p:'Hong Kong'},
+  {c:'SGD',p:'Singapur'},{c:'KRW',p:'Corea del Sur'},
+  {c:'THB',p:'Tailandia'},{c:'INR',p:'India'},
+  {c:'IDR',p:'Indonesia'},{c:'MYR',p:'Malasia'},
+  {c:'PHP',p:'Filipinas'},{c:'MXN',p:'Mexico'},
+  {c:'BRL',p:'Brasil'},{c:'ARS',p:'Argentina'},
+  {c:'CLP',p:'Chile'},{c:'COP',p:'Colombia'},
+  {c:'PEN',p:'Peru'},{c:'UYU',p:'Uruguay'},
+  {c:'BOB',p:'Bolivia'},{c:'PYG',p:'Paraguay'},
+  {c:'CRC',p:'Costa Rica'},{c:'GTQ',p:'Guatemala'},
+  {c:'DOP',p:'Rep. Dominicana'},{c:'ZAR',p:'Sudafrica'},
+  {c:'EGP',p:'Egipto'},{c:'MAD',p:'Marruecos'},
+  {c:'NGN',p:'Nigeria'},{c:'KES',p:'Kenia'},
+  {c:'AED',p:'Emiratos Arabes'},{c:'SAR',p:'Arabia Saudita'},
+  {c:'ILS',p:'Israel'},{c:'TRY',p:'Turquia'},
+  {c:'NOK',p:'Noruega'},{c:'SEK',p:'Suecia'},
+  {c:'DKK',p:'Dinamarca'},{c:'PLN',p:'Polonia'},
+  {c:'CZK',p:'Chequia'},{c:'HUF',p:'Hungria'},
+  {c:'RUB',p:'Rusia'},
+];
+
+function buscarMoneda(query, listId, cb) {
+  var q = (query||'').trim().toLowerCase();
+  var el = document.getElementById(listId);
+  if (!el) return;
+  if (!q) { el.style.display='none'; return; }
+  var hits = MONEDAS_DB.filter(function(m){
+    return m.c.toLowerCase().startsWith(q) || m.p.toLowerCase().includes(q);
+  }).slice(0,6);
+  if (!hits.length) { el.style.display='none'; return; }
+  el._cb = cb;
+  el.innerHTML = hits.map(function(m){
+    return '<div class="mon-item" onclick="monPick(\''+listId+'\',\''+m.c+'\',\''+m.p+'\')">'+m.c+' &mdash; '+m.p+'</div>';
+  }).join('');
+  el.style.display = 'block';
+}
+
+function monPick(listId, codigo, pais) {
+  var el = document.getElementById(listId);
+  if (el && el._cb) el._cb(codigo, pais);
+  if (el) el.style.display = 'none';
+}
+
 function calcConvInicio() {
   var monto = parseFloat(document.getElementById('convMontoI').value) || 0;
-  var de    = (document.getElementById('convDeI').value||'').split(' — ')[0].trim().split(' ').pop();
-  var a     = (document.getElementById('convAI').value||'').split(' — ')[0].trim().split(' ').pop();
+  var de    = (document.getElementById('convDeI').value||'').split(' - ')[0].trim();
+  var a     = (document.getElementById('convAI').value||'').split(' - ')[0].trim();
   var res   = document.getElementById('convResI');
   var tasa  = document.getElementById('convTasaI');
   if (monto === 0) { res.textContent = '—'; tasa.textContent = ''; return; }
@@ -1730,8 +1796,8 @@ function calcConvInicio() {
 
 function calcularConversor() {
   var monto = parseFloat(document.getElementById('convMonto').value) || 0;
-  var de    = (document.getElementById('convDe').value||'').split(' — ')[0].trim().split(' ').pop();
-  var a     = (document.getElementById('convA').value||'').split(' — ')[0].trim().split(' ').pop();
+  var de    = (document.getElementById('convDe').value||'').split(' - ')[0].trim();
+  var a     = (document.getElementById('convA').value||'').split(' - ')[0].trim();
   var res   = document.getElementById('convResultado');
   var tasa  = document.getElementById('convTasa');
 
