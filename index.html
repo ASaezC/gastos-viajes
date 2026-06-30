@@ -509,7 +509,7 @@ input[type="number"]::-webkit-inner-spin-button { display: none; }
       </select>
       <input class="setup-input" id="sMonedaOtra" placeholder="Código de moneda, ej: JPY, CHF, CNY"
         maxlength="6" style="display:none;text-transform:uppercase;margin-top:8px"
-        oninput="this.value=this.value.toUpperCase();cambiarSelectorMoneda('OTRA')">
+        oninput="actualizarMonedaOtra()">
     </div>
 
     <!-- Acordeón Viajeros — segundo -->
@@ -1265,14 +1265,22 @@ var monedaSeleccionada = null; // null = no elegida aún
 
 function cambiarSelectorMoneda(val) {
   const campoOtra = document.getElementById('sMonedaOtra');
+  const btnLabel = document.getElementById('btnAcordMoneda').querySelectorAll('span')[0];
+
   if (val === 'OTRA') {
     campoOtra.style.display = 'block';
-    const codigo = campoOtra.value.trim().toUpperCase();
-    monedaSeleccionada = codigo.length === 3 ? codigo : null;
-  } else {
-    campoOtra.style.display = 'none';
-    monedaSeleccionada = val;
+    return; // no tocar el foco ni recalcular display de nuevo en cada tecla
   }
+  campoOtra.style.display = 'none';
+  monedaSeleccionada = val;
+  btnLabel.textContent = '💱 Moneda: ' + val;
+}
+
+function actualizarMonedaOtra() {
+  const campoOtra = document.getElementById('sMonedaOtra');
+  const codigo = campoOtra.value.trim().toUpperCase();
+  campoOtra.value = codigo;
+  monedaSeleccionada = codigo.length === 3 ? codigo : null;
   const btnLabel = document.getElementById('btnAcordMoneda').querySelectorAll('span')[0];
   btnLabel.textContent = monedaSeleccionada ? ('💱 Moneda: ' + monedaSeleccionada) : '💱 Moneda del viaje';
 }
