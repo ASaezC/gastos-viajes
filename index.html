@@ -1181,6 +1181,8 @@ function crearViaje() {
   if (!viaje) { showToast('Falta el nombre del viaje'); return; }
   if (!monedaSeleccionada) { showToast('Elige la moneda del viaje'); return; }
   if (nombres.length < 2) { showToast('Agrega al menos 2 viajeros'); return; }
+  const nombresUnicos = new Set(nombres.map(n => n.toLowerCase()));
+  if (nombresUnicos.size !== nombres.length) { showToast('Los viajeros no pueden tener el mismo nombre'); return; }
 
   if (!firebaseConfigurado()) {
     showToast('⚠ Configura Firebase primero');
