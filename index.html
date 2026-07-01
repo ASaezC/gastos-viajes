@@ -194,6 +194,8 @@ input[type="number"]::-webkit-inner-spin-button { display: none; }
 .pill-opt input { display: none; }
 .pill-opt label { display: block; text-align: center; padding: 11px 4px; border-radius: 8px; font-size: 1rem; letter-spacing: 0.5px; text-transform: uppercase; border: 1px solid var(--line); color: var(--text3); cursor: pointer; transition: border-color 0.1s, background 0.1s, color 0.1s; touch-action: manipulation; -webkit-tap-highlight-color: transparent; user-select: none; }
 .pill-opt input:checked + label { border-color: var(--gold); background: rgba(201,146,42,0.1); color: var(--gold-l); }
+.pill-btn { flex:1; padding:11px 8px; border-radius:8px; font-size:1rem; letter-spacing:0.5px; text-transform:uppercase; border:1px solid var(--line); background:none; color:var(--text3); cursor:pointer; touch-action:manipulation; -webkit-tap-highlight-color:transparent; font-family:'IBM Plex Mono',monospace; transition:border-color 0.1s,background 0.1s,color 0.1s; user-select:none; }
+.pill-btn-on { border-color:var(--gold); background:rgba(201,146,42,0.1); color:var(--gold-l); }
 .btn-go { display: block; width: calc(100% - 28px); margin: 4px 14px 22px; padding: 17px; border: none; border-radius: 12px; cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 1rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 500; transition: transform 0.1s, background 0.15s; }
 .btn-go:active { transform: scale(0.98); }
 .btn-teal { background: var(--teal); color: #fff; }
@@ -882,10 +884,13 @@ input[type="number"]::-webkit-inner-spin-button { display: none; }
     <div class="c-card" style="margin-top:0">
       <div class="pill-wrap">
         <span class="pill-lbl">Tipo de gasto</span>
-        <div class="pill-group">
-          <div class="pill-opt"><input type="radio" name="tipo" id="rPropio" value="Propio" checked><label for="rPropio">Propio</label></div>
-          <div class="pill-opt"><input type="radio" name="tipo" id="rComp" value="Compartido"><label for="rComp" id="lblComp">Compartido 50/50</label></div>
+        <div class="pill-group" style="display:flex;gap:8px">
+          <button type="button" id="btnPropio" class="pill-btn pill-btn-on"
+            onclick="selTipo('Propio')">Propio</button>
+          <button type="button" id="btnComp" class="pill-btn"
+            onclick="selTipo('Compartido')">Compartido</button>
         </div>
+        <input type="hidden" id="tipoGasto" value="Propio">
       </div>
     </div>
     <button class="btn-go btn-teal" id="btnGuardar" onclick="guardar()">Registrar Gasto</button>
@@ -1250,6 +1255,12 @@ function lanzarApp() {
   suscribir();
 }
 
+function selTipo(val) {
+  document.getElementById('tipoGasto').value = val;
+  document.getElementById('btnPropio').classList.toggle('pill-btn-on', val === 'Propio');
+  document.getElementById('btnComp').classList.toggle('pill-btn-on', val === 'Compartido');
+}
+
 function _iniciales(nombre) {
   if (!nombre) return '?';
   const partes = nombre.trim().split(/\s+/);
@@ -1448,7 +1459,7 @@ function guardar() {
   const valorRaw = document.getElementById('fValor').value.replace(/[^0-9.]/g, '');
   const valor = parseFloat(valorRaw);
   const pago  = document.getElementById('fPago').value;
-  const tipo  = document.querySelector('input[name="tipo"]:checked').value;
+  const tipo  = document.getElementById('tipoGasto').value || 'Propio';
 
   if (!desc)                    { showToast('Falta la descripción');       return; }
   if (!cat)                     { showToast('Falta la categoría');         return; }
@@ -1514,21 +1525,14 @@ function abrirForm(key = null) {
     Array.from(selPago.options).forEach(o => {
       if (o.value === g.pago || o.text === g.pago) selPago.value = o.value;
     });
-    const radio = document.querySelector(`input[name="tipo"][value="${g.tipo === 'Compartido' ? 'Compartido' : 'Propio'}"]`);
-    if (radio) radio.checked = true;
+    selTipo(g.tipo === 'Compartido' ? 'Compartido' : 'Propio');
   } else {
     document.getElementById('fDesc').value  = '';
     document.getElementById('fCat').value   = '';
     document.getElementById('fFecha').valueAsDate = new Date();
     document.getElementById('fValor').value = '';
     document.getElementById('fPago').value  = '';
-    // Forzar re-render del radio en iOS
-    const rP = document.getElementById('rPropio');
-    const rC = document.getElementById('rComp');
-    rC.checked = false;
-    rP.checked = true;
-    // Disparar change para que iOS actualice el estilo :checked
-    rP.dispatchEvent(new Event('change'));
+    selTipo('Propio');
   }
   openOv('ovForm');
   setTimeout(() => {
@@ -1537,7 +1541,8 @@ function abrirForm(key = null) {
     const nVF = [S.u1,S.u2,...(Array.isArray(S.extraViajeros)?S.extraViajeros:[])].filter(Boolean).length;
     const pctF = nVF>0 ? Math.round(100/nVF) : 50;
     const lblC = document.getElementById('lblComp');
-    if (lblC) lblC.textContent = 'Compartido ' + Array(nVF).fill(pctF+'%').join('/');
+    const btnC = document.getElementById('btnComp');
+    if (btnC) btnC.textContent = 'Compartido ' + Array(nVF).fill(pctF+'%').join('/');
   }, 100);
   const nVF=[S.u1,S.u2,...(Array.isArray(S.extraViajeros)?S.extraViajeros:[])].filter(Boolean).length;
   const pctF=nVF>0?Math.round(100/nVF):50;
