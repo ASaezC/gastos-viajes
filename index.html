@@ -2124,6 +2124,15 @@ function fmtBal(n) {
 // ═══════════════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════════════
+// Cerrar listas de moneda al tocar fuera
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.mon-search-wrap')) {
+    document.querySelectorAll('.mon-list').forEach(function(l) {
+      l.style.display = 'none';
+    });
+  }
+});
+
 window.addEventListener('load', () => {
   whenFB(() => {
     document.getElementById('loadingOv').style.display = 'none';
