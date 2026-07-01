@@ -585,7 +585,7 @@ input[type="number"]::-webkit-inner-spin-button { display: none; }
   <!-- Panel Unirse -->
   <div id="panelUnir" style="display:none">
     <div class="setup-label">Código del viaje (6 letras)</div>
-    <input class="setup-input code-input" id="sCodigo" placeholder="XXXXXX" maxlength="6">
+    <input class="setup-input code-input" id="sCodigo" placeholder="XXXXXX" maxlength="6" style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase()">
     <div class="setup-label">Tu nombre</div>
     <input class="setup-input" id="sYo" placeholder="¿Cómo te llamas?" maxlength="20">
     <div class="setup-info">Pide el código a quien creó el viaje.</div>
@@ -1394,6 +1394,13 @@ function renderViajes() {
       <div class="vc-code">Código: ${v.codigo}</div>
     </div>`;
   }).join('');
+
+  // Touch listeners con passive:true — DESPUÉS de setear innerHTML
+  list.querySelectorAll('.gasto-item[data-key]').forEach(function(el) {
+    var k = el.getAttribute('data-key');
+    el.addEventListener('touchstart', function(e){ ts(e, k); }, {passive:true});
+    el.addEventListener('touchend',   function(e){ te(e, k); }, {passive:true});
+  });
 }
 
 function cambiarViaje(codigo) {
@@ -1706,15 +1713,6 @@ function renderGastos() {
     list.innerHTML = `<div class="empty"><div class="empty-icon">🧾</div><div class="empty-msg">Sin gastos · pulsa ＋ para agregar</div></div>`;
     return;
   }
-
-  // Agregar touch listeners con passive:true después de render
-  setTimeout(function() {
-    list.querySelectorAll('.gasto-item[data-key]').forEach(function(el) {
-      var key = el.getAttribute('data-key');
-      el.addEventListener('touchstart', function(e){ ts(e, key); }, {passive:true});
-      el.addEventListener('touchend',   function(e){ te(e, key); }, {passive:true});
-    });
-  }, 0);
 
   list.innerHTML = entries.map(([key, g]) => {
     const icon = CAT_ICONS[g.cat] || '🔧';
