@@ -1226,8 +1226,9 @@ function unirseViaje() {
   const codigo = document.getElementById('sCodigo').value.trim().toUpperCase();
   const yo     = document.getElementById('sYo').value.trim();
 
-  if (codigo.length !== 6) { showToast('El código debe tener 6 letras'); return; }
-  if (!yo)                 { showToast('Escribe tu nombre'); return; }
+  if (codigo.length !== 6)        { showToast('El código debe tener 6 letras'); return; }
+  if (!/^[A-Z]{6}$/.test(codigo)) { showToast('El código solo debe tener letras'); return; }
+  if (!yo)                         { showToast('Escribe tu nombre'); return; }
 
   if (!firebaseConfigurado()) {
     showToast('⚠ Configura Firebase primero');
