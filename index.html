@@ -2021,10 +2021,10 @@ function te(e, key) {
   const dx = touchX0 - e.changedTouches[0].clientX;
   const wrap = document.getElementById('gw-' + CSS.escape(key));
   if (!wrap) return;
-  if (dx > 48) {
+  if (dx > 60) {
     document.querySelectorAll('.gasto-wrap.sw').forEach(w => { if (w!==wrap) w.classList.remove('sw'); });
     wrap.classList.add('sw');
-  } else if (dx < -20) {
+  } else if (dx < -30) {
     wrap.classList.remove('sw');
   }
 }
