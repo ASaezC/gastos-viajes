@@ -1493,6 +1493,7 @@ function guardar() {
   if (!desc)                    { showToast('Falta la descripción');       return; }
   if (!cat)                     { showToast('Falta la categoría');         return; }
   if (!fecha)                   { showToast('Falta la fecha');             return; }
+  if (fecha > new Date().toISOString().slice(0,10)) { showToast('La fecha no puede ser futura'); return; }
   if (isNaN(valor) || valor<=0) { showToast('El valor debe ser mayor a 0'); return; }
   if (!pago)                    { showToast('Indica quién pagó');          return; }
 
