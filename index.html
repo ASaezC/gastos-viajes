@@ -1479,11 +1479,8 @@ function suscribir() {
       guardarEnLista({ codigo: S.codigo, viaje: S.viaje, u1: S.u1, u2: S.u2,
         extraViajeros: S.extraViajeros, monedaBase: S.monedaBase, yo: S.yo, ultimoTotal: total });
       renderViajes();
-      // Diferir renders no críticos para no bloquear el hilo principal
-      requestAnimationFrame(function() {
-        renderGastos();
-        renderResumen();
-      });
+      renderGastos();
+      renderResumen();
     }, () => setSyncDot('err'));
   }).catch(e => {
     setSyncDot('err');
