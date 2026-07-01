@@ -1716,12 +1716,15 @@ function exportarExcel() {
   var gastos = Object.values(S.gastos).sort(function(a,b) {
     return (a.fecha||'').localeCompare(b.fecha||'');
   });
-  var lineas = ['Fecha,Descripcion,Categoria,Quien pago,Tipo,Valor ' + base + ',Moneda original,Valor original'];
+  var csv_esc = function(v) { return '"' + String(v).replace(/"/g, '""') + '"'; };
+  var lineas = [['Fecha','Descripcion','Categoria','Quien pago','Tipo','Valor '+base,'Moneda original','Valor original'].map(csv_esc).join(',')];
   for (var i=0; i<gastos.length; i++) {
     var g = gastos[i];
     var cat = (g.cat || '').replace(/^\S+\s/, '');
-    lineas.push([(g.fecha||''), (g.desc||''), cat, (g.pago||''), (g.tipo||''),
-      (g.valor||0), (g.monedaOrig||base), (g.valorOrig!=null?g.valorOrig:g.valor||0)].join(','));
+    lineas.push([
+      g.fecha||'', g.desc||'', cat, g.pago||'', g.tipo||'',
+      g.valor||0, g.monedaOrig||base, g.valorOrig!=null?g.valorOrig:g.valor||0
+    ].map(csv_esc).join(','));
   }
   var txt = lineas.join('\r\n');
   var blob = new Blob(['\uFEFF' + txt], {type: 'text/csv;charset=utf-8;'});
