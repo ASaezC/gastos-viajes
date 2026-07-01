@@ -1462,15 +1462,8 @@ function nuevoViaje() {
 function suscribir() {
   const { db, ref, onValue, get } = window.FB;
 
-  // Leer viaje primero para tener extraViajeros antes de renderizar
-  get(ref(db, `viajes/${S.codigo}`)).then(snap => {
-    const d = snap.val();
-    if (d) {
-      S.extraViajeros = d.extraViajeros || [];
-      S.monedaBase    = d.monedaBase    || 'COP';
-      actualizarUI();
-    }
-    // Suscribir gastos DESPUÉS de tener extraViajeros
+  // Intentar leer datos del viaje — si falla, usar datos locales y continuar
+  const suscribirGastos = () => {
     const gastosRef = ref(db, `gastos/${S.codigo}`);
     S.unsubscribe = onValue(gastosRef, snap => {
       S.gastos = snap.val() || {};
@@ -1482,10 +1475,20 @@ function suscribir() {
       renderGastos();
       renderResumen();
     }, () => setSyncDot('err'));
+  };
+
+  get(ref(db, `viajes/${S.codigo}`)).then(snap => {
+    const d = snap.val();
+    if (d) {
+      S.extraViajeros = d.extraViajeros || [];
+      S.monedaBase    = d.monedaBase    || 'COP';
+      actualizarUI();
+    }
+    suscribirGastos();
   }).catch(e => {
-    setSyncDot('err');
-    showToast('Error al cargar el viaje — verifica tu conexión');
-    console.error('suscribir get error:', e);
+    // Si falla la lectura del viaje, continuar con datos locales
+    console.warn('No se pudo leer viaje de Firebase, usando datos locales:', e);
+    suscribirGastos();
   });
 }
 
