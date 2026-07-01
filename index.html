@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Viaje $">
+<meta name="apple-mobile-web-app-title" content="Gastos de Viaje">
 <meta name="theme-color" content="#0d0d0d">
 <title>Gastos de Viaje</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1026,9 +1026,7 @@ async function obtenerTasas() {
   }
 }
 
-/* eliminada — código obsoleto */
 
-/* eliminada — código obsoleto */
 
 function whenFB(fn) {
   if (window.FB_READY) { fn(); return; }
@@ -1091,7 +1089,6 @@ function loadSession() {
 // ═══════════════════════════════════════════════════════
 //  SETUP TABS
 // ═══════════════════════════════════════════════════════
-/* eliminada — código obsoleto */
 
 // ═══════════════════════════════════════════════════════
 //  VERIFICAR FIREBASE CONFIGURADO
@@ -1132,7 +1129,17 @@ function cambiarSelectorMoneda(val) {
   btnLabel.textContent = '💱 Moneda: ' + val;
 }
 
-/* eliminada — código obsoleto */
+
+function mostrarUnirse() {
+  var p = document.getElementById('panelUnir');
+  var visible = p.style.display !== 'none';
+  p.style.display = visible ? 'none' : 'block';
+  if (!visible) {
+    document.getElementById('sCodigo').value = '';
+    document.getElementById('sYo').value = '';
+    setTimeout(function(){ document.getElementById('sCodigo').focus(); }, 150);
+  }
+}
 
 function toggleAcord(id, btn) {
   var body = document.getElementById(id);
@@ -1348,7 +1355,9 @@ function guardarEnLista(datos) {
   const lista = getViajesGuardados();
   const idx = lista.findIndex(v => v.codigo === datos.codigo);
   if (idx >= 0) lista[idx] = datos; else lista.push(datos);
-  localStorage.setItem('gv3_lista', JSON.stringify(lista));
+  // Límite de 20 viajes — eliminar los más antiguos si se supera
+  const limitada = lista.slice(-20);
+  localStorage.setItem('gv3_lista', JSON.stringify(limitada));
 }
 
 function renderViajes() {
@@ -1489,7 +1498,7 @@ function guardar() {
   const monedaGasto = document.getElementById('fMoneda').value || 'COP';
   const cat   = document.getElementById('fCat').value;
   const fecha = document.getElementById('fFecha').value;
-  const valorRaw = document.getElementById('fValor').value.replace(/[^0-9.]/g, '');
+  const valorRaw = document.getElementById('fValor').value.replace(',', '.').replace(/[^0-9.]/g, '');
   const valor = parseFloat(valorRaw);
   const pago  = document.getElementById('fPago').value;
   const tipo  = document.getElementById('tipoGasto').value || 'Propio';
@@ -1698,6 +1707,15 @@ function renderGastos() {
     return;
   }
 
+  // Agregar touch listeners con passive:true después de render
+  setTimeout(function() {
+    list.querySelectorAll('.gasto-item[data-key]').forEach(function(el) {
+      var key = el.getAttribute('data-key');
+      el.addEventListener('touchstart', function(e){ ts(e, key); }, {passive:true});
+      el.addEventListener('touchend',   function(e){ te(e, key); }, {passive:true});
+    });
+  }, 0);
+
   list.innerHTML = entries.map(([key, g]) => {
     const icon = CAT_ICONS[g.cat] || '🔧';
     const fechaFmt = g.fecha ? g.fecha.split('-').reverse().join('/') : '';
@@ -1710,8 +1728,7 @@ function renderGastos() {
     return `
     <div class="gasto-wrap" id="gw-${safeKey}">
       <div class="gasto-item"
-           ontouchstart="ts(event,'${key}')"
-           ontouchend="te(event,'${key}')"
+           data-key="${key}"
            onclick="closeSw('${key}')">
         <div class="gi-icon">${icon}</div>
         <div class="gi-body">
