@@ -1287,8 +1287,8 @@ function actualizarUI() {
   const av = document.getElementById('topAvatar');
   if (av) av.textContent = _iniciales(S.yo);
 
-  // Selector resumen muestra moneda base del viaje
-  monedaResumen = null;
+  // Resetear selector resumen (variable global)
+  if (typeof monedaResumen !== 'undefined') monedaResumen = null;
   const selR = document.getElementById('selMonedaResumen');
   if (selR) {
     // Agregar opción de moneda base si no existe
