@@ -1815,9 +1815,13 @@ function calcConvInicio() {
   var res   = document.getElementById('convResI');
   var tasa  = document.getElementById('convTasaI');
   if (monto === 0) { res.textContent = '—'; tasa.textContent = ''; return; }
+  if (!de || de.length < 2) { res.textContent = 'Elige moneda origen'; tasa.textContent = ''; return; }
+  if (!a  || a.length  < 2) { res.textContent = 'Elige moneda destino'; tasa.textContent = ''; return; }
   var rates = FALLBACK_USD;
-  var rDe = rates[de] || 1;
-  var rA  = rates[a]  || 1;
+  var rDe = rates[de];
+  var rA  = rates[a];
+  if (!rDe) { res.textContent = de + ' no disponible'; tasa.textContent = ''; return; }
+  if (!rA)  { res.textContent = a  + ' no disponible'; tasa.textContent = ''; return; }
   var resultado = monto / rDe * rA;
   var syms = {COP:'$',USD:'US$',EUR:'€',GBP:'£',ARS:'$',CLP:'$',MXN:'$',PEN:'S/',BRL:'R$',JPY:'¥'};
   var sinDec = ['COP','CLP','ARS','MXN','JPY','KRW','IDR','VND','PKR','PYG','NGN','KES','TZS','HUF','GHS'];
@@ -1836,11 +1840,15 @@ function calcularConversor() {
   var tasa  = document.getElementById('convTasa');
 
   if (monto === 0) { res.textContent = '—'; tasa.textContent = ''; return; }
-  if (de === a)    { res.textContent = monto; tasa.textContent = 'Misma moneda'; return; }
+  if (!de || de.length < 2) { res.textContent = 'Elige moneda origen'; tasa.textContent = ''; return; }
+  if (!a  || a.length  < 2) { res.textContent = 'Elige moneda destino'; tasa.textContent = ''; return; }
+  if (de === a) { res.textContent = monto; tasa.textContent = 'Misma moneda'; return; }
 
   var rates = (typeof tasasUSD !== 'undefined' && Object.keys(tasasUSD).length > 0) ? tasasUSD : FALLBACK_USD;
-  var rDe = rates[de] || FALLBACK_USD[de] || 1;
-  var rA  = rates[a]  || FALLBACK_USD[a]  || 1;
+  var rDe = rates[de] || FALLBACK_USD[de];
+  var rA  = rates[a]  || FALLBACK_USD[a];
+  if (!rDe) { res.textContent = de + ' no disponible'; tasa.textContent = ''; return; }
+  if (!rA)  { res.textContent = a  + ' no disponible'; tasa.textContent = ''; return; }
   var resultado = monto / rDe * rA;
 
   var syms = {COP:'$',USD:'US$',EUR:'€',GBP:'£',ARS:'$',CLP:'$',MXN:'$',PEN:'S/',BRL:'R$',JPY:'¥'};
