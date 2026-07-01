@@ -1716,7 +1716,7 @@ function exportarExcel() {
   var gastos = Object.values(S.gastos).sort(function(a,b) {
     return (a.fecha||'').localeCompare(b.fecha||'');
   });
-  var csv_esc = function(v) { return '"' + String(v).replace(/"/g, '""') + '"'; };
+  var csv_esc = function(v) { var s = String(v); return '"' + s.split('"').join('""') + '"'; };
   var lineas = [['Fecha','Descripcion','Categoria','Quien pago','Tipo','Valor '+base,'Moneda original','Valor original'].map(csv_esc).join(',')];
   for (var i=0; i<gastos.length; i++) {
     var g = gastos[i];
