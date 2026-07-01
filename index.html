@@ -1686,8 +1686,6 @@ function renderGastos() {
   const list  = document.getElementById('gastoList');
   const badge = document.getElementById('cntBadge');
   const entries = Object.entries(S.gastos).sort((a,b) => (b[1].ts||0)-(a[1].ts||0));
-  document.getElementById('cfgU1').textContent = S.u1;
-  document.getElementById('cfgU2').textContent = S.u2;
   badge.textContent = entries.length;
 
   if (!entries.length) {
