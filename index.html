@@ -1255,6 +1255,13 @@ function lanzarApp() {
   document.getElementById('setup').style.display = 'none';
   document.getElementById('app').style.display   = 'flex';
 
+  // Activar sc-gastos y su nav-item por defecto
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('on'));
+  document.getElementById('sc-gastos').classList.add('on');
+  const navGastos = document.querySelector('.nav-item[onclick*="gastos"]');
+  if (navGastos) navGastos.classList.add('on');
+
   actualizarUI();
   document.getElementById('fFecha').valueAsDate = new Date();
   var selM = document.getElementById('fMoneda');
