@@ -1471,6 +1471,7 @@ function guardar() {
   const pago  = document.getElementById('fPago').value;
   const tipo  = document.getElementById('tipoGasto').value || 'Propio';
 
+  if (!S.codigo)                { showToast('Sin viaje activo');           return; }
   if (!desc)                    { showToast('Falta la descripción');       return; }
   if (!cat)                     { showToast('Falta la categoría');         return; }
   if (!fecha)                   { showToast('Falta la fecha');             return; }
