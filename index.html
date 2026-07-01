@@ -1061,8 +1061,18 @@ function saveSession() {
     monedaBase: S.monedaBase || 'COP',
     yo: S.yo
   };
-  localStorage.setItem('gv3', JSON.stringify(data));
-  guardarEnLista(data);
+  try {
+    localStorage.setItem('gv3', JSON.stringify(data));
+    guardarEnLista(data);
+  } catch(e) {
+    // localStorage lleno — limpiar lista antigua y reintentar
+    try {
+      localStorage.removeItem('gv3_lista');
+      localStorage.setItem('gv3', JSON.stringify(data));
+    } catch(e2) {
+      console.warn('localStorage no disponible:', e2);
+    }
+  }
 }
 function loadSession() {
   try {
