@@ -1109,7 +1109,9 @@ function firebaseConfigurado() {
 // ═══════════════════════════════════════════════════════
 function genCodigo() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
-  return Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+  const arr = new Uint8Array(6);
+  (window.crypto || window.msCrypto).getRandomValues(arr);
+  return Array.from(arr, b => chars[b % chars.length]).join('');
 }
 
 // ═══════════════════════════════════════════════════════
