@@ -1209,8 +1209,8 @@ function crearViaje() {
           lanzarApp();
         })
         .catch(e => {
-          showToast('Error al crear: ' + e.message);
-          console.error(e);
+          showToast('Error al crear el viaje — verifica tu conexión');
+          console.error('crearViaje set error:', e);
         });
     }).catch(() => showToast('Error de conexión al crear viaje'));
   };
