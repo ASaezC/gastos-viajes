@@ -1137,6 +1137,15 @@ function toggleAcord(id, btn) {
   var open = body.style.display !== 'none';
   body.style.display = open ? 'none' : 'block';
   btn.classList.toggle('open', !open);
+  // Limpiar resultado del conversor al cerrarlo
+  if (open && id === 'acordConvInicio') {
+    var montoEl = document.getElementById('convMontoI');
+    var resEl   = document.getElementById('convResI');
+    var tasaEl  = document.getElementById('convTasaI');
+    if (montoEl) montoEl.value = '';
+    if (resEl)   resEl.textContent = '—';
+    if (tasaEl)  tasaEl.textContent = '';
+  }
 }
 
 function abrirViajeros(btn) {
