@@ -585,7 +585,7 @@ input[type="number"]::-webkit-inner-spin-button { display: none; }
   <!-- Panel Unirse -->
   <div id="panelUnir" style="display:none">
     <div class="setup-label">Código del viaje (6 letras)</div>
-    <input class="setup-input code-input" id="sCodigo" placeholder="XXXXXX" maxlength="6" style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase()">
+    <input class="setup-input code-input" id="sCodigo" placeholder="XXXXXX" maxlength="6">
     <div class="setup-label">Tu nombre</div>
     <input class="setup-input" id="sYo" placeholder="¿Cómo te llamas?" maxlength="20">
     <div class="setup-info">Pide el código a quien creó el viaje.</div>
@@ -1394,13 +1394,6 @@ function renderViajes() {
       <div class="vc-code">Código: ${v.codigo}</div>
     </div>`;
   }).join('');
-
-  // Touch listeners con passive:true — DESPUÉS de setear innerHTML
-  list.querySelectorAll('.gasto-item[data-key]').forEach(function(el) {
-    var k = el.getAttribute('data-key');
-    el.addEventListener('touchstart', function(e){ ts(e, k); }, {passive:true});
-    el.addEventListener('touchend',   function(e){ te(e, k); }, {passive:true});
-  });
 }
 
 function cambiarViaje(codigo) {
@@ -1462,8 +1455,15 @@ function nuevoViaje() {
 function suscribir() {
   const { db, ref, onValue, get } = window.FB;
 
-  // Intentar leer datos del viaje — si falla, usar datos locales y continuar
-  const suscribirGastos = () => {
+  // Leer viaje primero para tener extraViajeros antes de renderizar
+  get(ref(db, `viajes/${S.codigo}`)).then(snap => {
+    const d = snap.val();
+    if (d) {
+      S.extraViajeros = d.extraViajeros || [];
+      S.monedaBase    = d.monedaBase    || 'COP';
+      actualizarUI();
+    }
+    // Suscribir gastos DESPUÉS de tener extraViajeros
     const gastosRef = ref(db, `gastos/${S.codigo}`);
     S.unsubscribe = onValue(gastosRef, snap => {
       S.gastos = snap.val() || {};
@@ -1472,23 +1472,16 @@ function suscribir() {
       guardarEnLista({ codigo: S.codigo, viaje: S.viaje, u1: S.u1, u2: S.u2,
         extraViajeros: S.extraViajeros, monedaBase: S.monedaBase, yo: S.yo, ultimoTotal: total });
       renderViajes();
-      renderGastos();
-      renderResumen();
+      // Diferir renders no críticos para no bloquear el hilo principal
+      requestAnimationFrame(function() {
+        renderGastos();
+        renderResumen();
+      });
     }, () => setSyncDot('err'));
-  };
-
-  get(ref(db, `viajes/${S.codigo}`)).then(snap => {
-    const d = snap.val();
-    if (d) {
-      S.extraViajeros = d.extraViajeros || [];
-      S.monedaBase    = d.monedaBase    || 'COP';
-      actualizarUI();
-    }
-    suscribirGastos();
   }).catch(e => {
-    // Si falla la lectura del viaje, continuar con datos locales
-    console.warn('No se pudo leer viaje de Firebase, usando datos locales:', e);
-    suscribirGastos();
+    setSyncDot('err');
+    showToast('Error al cargar el viaje — verifica tu conexión');
+    console.error('suscribir get error:', e);
   });
 }
 
@@ -1713,6 +1706,15 @@ function renderGastos() {
     list.innerHTML = `<div class="empty"><div class="empty-icon">🧾</div><div class="empty-msg">Sin gastos · pulsa ＋ para agregar</div></div>`;
     return;
   }
+
+  // Agregar touch listeners con passive:true después de render
+  setTimeout(function() {
+    list.querySelectorAll('.gasto-item[data-key]').forEach(function(el) {
+      var key = el.getAttribute('data-key');
+      el.addEventListener('touchstart', function(e){ ts(e, key); }, {passive:true});
+      el.addEventListener('touchend',   function(e){ te(e, key); }, {passive:true});
+    });
+  }, 0);
 
   list.innerHTML = entries.map(([key, g]) => {
     const icon = CAT_ICONS[g.cat] || '🔧';
