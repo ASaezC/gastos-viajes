@@ -1021,23 +1021,9 @@ async function obtenerTasas() {
   }
 }
 
-function convertirACOP(valor, moneda) {
-  if (moneda === 'COP') return valor;
-  const rOrigen = tasasUSD[moneda] || FALLBACK_USD[moneda] || 1;
-  const rCOP    = tasasUSD['COP']  || FALLBACK_USD['COP']  || 4100;
-  return valor / rOrigen * rCOP;
-}
+/* eliminada — código obsoleto */
 
-function actualizarConversion() {
-  const val    = parseFloat(document.getElementById('fValor').value) || 0;
-  const moneda = document.getElementById('fMoneda').value;
-  const row    = document.getElementById('convRow');
-  const lbl    = document.getElementById('convLabel');
-  if (moneda === 'COP' || val === 0) { row.style.display = 'none'; return; }
-  const cop = convertirACOP(val, moneda);
-  row.style.display = 'block';
-  lbl.textContent   = `≈ ${Math.round(cop).toLocaleString('es-CO')} COP ${tasasOk ? '' : '(tasa estimada)'}`;
-}
+/* eliminada — código obsoleto */
 
 function whenFB(fn) {
   if (window.FB_READY) { fn(); return; }
@@ -1090,12 +1076,7 @@ function loadSession() {
 // ═══════════════════════════════════════════════════════
 //  SETUP TABS
 // ═══════════════════════════════════════════════════════
-function setTab(t) { /* legacy */ }
-function mostrarUnirse() {
-  const p = document.getElementById('panelUnir');
-  p.style.display = p.style.display === 'none' ? 'block' : 'none';
-  if (p.style.display === 'block') setTimeout(() => document.getElementById('sCodigo').focus(), 150);
-}
+/* eliminada — código obsoleto */
 
 // ═══════════════════════════════════════════════════════
 //  VERIFICAR FIREBASE CONFIGURADO
@@ -1134,14 +1115,7 @@ function cambiarSelectorMoneda(val) {
   btnLabel.textContent = '💱 Moneda: ' + val;
 }
 
-function actualizarMonedaOtra() {
-  const campoOtra = document.getElementById('sMonedaOtra');
-  const codigo = campoOtra.value.trim().toUpperCase();
-  campoOtra.value = codigo;
-  monedaSeleccionada = codigo.length === 3 ? codigo : null;
-  const btnLabel = document.getElementById('btnAcordMoneda').querySelectorAll('span')[0];
-  btnLabel.textContent = monedaSeleccionada ? ('💱 Moneda: ' + monedaSeleccionada) : '💱 Moneda del viaje';
-}
+/* eliminada — código obsoleto */
 
 function toggleAcord(id, btn) {
   var body = document.getElementById(id);
