@@ -192,7 +192,7 @@ input[type="number"]::-webkit-inner-spin-button { display: none; }
 .pill-group { display: flex; gap: 8px; }
 .pill-opt { flex: 1; }
 .pill-opt input { display: none; }
-.pill-opt label { display: block; text-align: center; padding: 11px 4px; border-radius: 8px; font-size: 1rem; letter-spacing: 0.5px; text-transform: uppercase; border: 1px solid var(--line); color: var(--text3); cursor: pointer; transition: all 0.15s; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.pill-opt label { display: block; text-align: center; padding: 11px 4px; border-radius: 8px; font-size: 1rem; letter-spacing: 0.5px; text-transform: uppercase; border: 1px solid var(--line); color: var(--text3); cursor: pointer; transition: border-color 0.1s, background 0.1s, color 0.1s; touch-action: manipulation; -webkit-tap-highlight-color: transparent; user-select: none; }
 .pill-opt input:checked + label { border-color: var(--gold); background: rgba(201,146,42,0.1); color: var(--gold-l); }
 .btn-go { display: block; width: calc(100% - 28px); margin: 4px 14px 22px; padding: 17px; border: none; border-radius: 12px; cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 1rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 500; transition: transform 0.1s, background 0.15s; }
 .btn-go:active { transform: scale(0.98); }
@@ -1522,10 +1522,23 @@ function abrirForm(key = null) {
     document.getElementById('fFecha').valueAsDate = new Date();
     document.getElementById('fValor').value = '';
     document.getElementById('fPago').value  = '';
-    document.getElementById('rPropio').checked = true;
+    // Forzar re-render del radio en iOS
+    const rP = document.getElementById('rPropio');
+    const rC = document.getElementById('rComp');
+    rC.checked = false;
+    rP.checked = true;
+    // Disparar change para que iOS actualice el estilo :checked
+    rP.dispatchEvent(new Event('change'));
   }
   openOv('ovForm');
-  setTimeout(() => { if (!es) document.getElementById('fDesc').focus(); }, 350);
+  setTimeout(() => {
+    if (!es) document.getElementById('fDesc').focus();
+    // Actualizar label compartido dinámico
+    const nVF = [S.u1,S.u2,...(Array.isArray(S.extraViajeros)?S.extraViajeros:[])].filter(Boolean).length;
+    const pctF = nVF>0 ? Math.round(100/nVF) : 50;
+    const lblC = document.getElementById('lblComp');
+    if (lblC) lblC.textContent = 'Compartido ' + Array(nVF).fill(pctF+'%').join('/');
+  }, 100);
   const nVF=[S.u1,S.u2,...(Array.isArray(S.extraViajeros)?S.extraViajeros:[])].filter(Boolean).length;
   const pctF=nVF>0?Math.round(100/nVF):50;
   const lblC=document.getElementById('lblComp');
