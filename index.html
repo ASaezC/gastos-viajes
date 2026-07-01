@@ -1271,7 +1271,6 @@ function lanzarApp() {
   const navGastos = document.querySelector('.nav-item[onclick*="gastos"]');
   if (navGastos) navGastos.classList.add('on');
 
-  actualizarUI();
   document.getElementById('fFecha').valueAsDate = new Date();
   var selM = document.getElementById('fMoneda');
   if (selM) selM.value = S.monedaBase || 'COP';
@@ -1459,8 +1458,11 @@ function suscribir() {
       guardarEnLista({ codigo: S.codigo, viaje: S.viaje, u1: S.u1, u2: S.u2,
         extraViajeros: S.extraViajeros, monedaBase: S.monedaBase, yo: S.yo, ultimoTotal: total });
       renderViajes();
-      renderGastos();
-      renderResumen();
+      // Diferir renders no críticos para no bloquear el hilo principal
+      requestAnimationFrame(function() {
+        renderGastos();
+        renderResumen();
+      });
     }, () => setSyncDot('err'));
   }).catch(e => {
     setSyncDot('err');
