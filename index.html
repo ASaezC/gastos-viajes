@@ -386,7 +386,7 @@ input[type="number"]::-webkit-inner-spin-button { display: none; }
 .loading-msg { font-size: 0.58rem; letter-spacing: 3px; text-transform: uppercase; color: var(--text3); }
 
 /* ── TOAST */
-.toast { position: fixed; z-index: 400; bottom: calc(70px + var(--safe-b)); left: 50%; transform: translateX(-50%) translateY(10px); background: var(--bg2); color: var(--gold-l); border: 1px solid var(--line); padding: 10px 20px; border-radius: 20px; font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase; white-space: nowrap; opacity: 0; pointer-events: none; transition: all 0.28s cubic-bezier(.4,0,.2,1); }
+.toast { position: fixed; z-index: 400; bottom: calc(80px + var(--safe-b)); left: 50%; transform: translateX(-50%) translateY(10px); background: var(--bg3); color: var(--gold-ll); border: 1.5px solid var(--gold); padding: 14px 24px; border-radius: 14px; font-size: 0.92rem; letter-spacing: 1px; text-transform: none; white-space: nowrap; opacity: 0; pointer-events: none; transition: all 0.28s cubic-bezier(.4,0,.2,1); box-shadow: 0 4px 20px rgba(0,0,0,0.5); max-width: 90vw; text-align: center; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 /* ── FOTO HERO EN SETUP */
@@ -1150,7 +1150,7 @@ function toggleAcord(id, btn) {
 
 function abrirViajeros(btn) {
   if (!monedaSeleccionada) {
-    showToast('Primero elige la moneda del viaje ☝');
+    showToast('⚠️ Primero elige la moneda del viaje');
     var btnMoneda = document.getElementById('btnAcordMoneda');
     document.getElementById('acordMoneda').style.display = 'block';
     btnMoneda.classList.add('open');
@@ -2110,7 +2110,7 @@ function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
 }
 
 // ═══════════════════════════════════════════════════════
